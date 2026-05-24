@@ -84,6 +84,8 @@ List top risks with severity (High/Medium/Low):
 - **Privacy/data sensitivity risk** -- what data is being stored or displayed? What are the regulatory obligations (GDPR, LGPD, HIPAA, etc.) mentioned in the project?
 - **UX risk** -- who is the target audience? What is their technical comfort level? What friction could cause abandonment?
 - **Integration risk** -- dependency on external services; what happens when they fail?
+- **Adoption risk** -- is the feature discoverable? Will users understand its value without onboarding?
+- **Scope risk** -- is the feature well-bounded, or does it have tendrils into multiple existing systems that could expand scope during implementation?
 
 ---
 
@@ -104,8 +106,8 @@ Return a structured report with these sections:
 - When..., I want to..., so I can...
 
 ### Acceptance Criteria
-| # | Given | When | Then | Role |
-|---|-------|------|------|------|
+| # | Given | When | Then | Role | Priority |
+|---|-------|------|------|------|----------|
 ...
 
 ### Anti-Goals (v1 -- Out of Scope)
@@ -122,5 +124,10 @@ Return a structured report with these sections:
 |------|------|----------|------------|
 ...
 ```
+
+### Dependencies and Sequencing
+- List any features, data, or infrastructure that must exist before this feature can ship
+- Identify if this feature blocks or is blocked by other planned work
+- Note any A/B test or feature flag requirements for a safe rollout
 
 Be opinionated. If the feature description is vague or has an internal contradiction, call it out. If a decision is risky or product-wrong, say so with reasoning. You represent the end user's voice and the project's quality standards -- both must be protected.

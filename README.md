@@ -12,20 +12,24 @@ claude
 
 Then run:
 ```
-/setup-project
+/einstein-workflow:setup-project
 ```
 
 The wizard will ask about your project and generate:
 - `CLAUDE.md` — project context for all agents
 - `.claude/settings.json` — MCP servers and permissions
 - `.claude/WORKFLOW.md` — team topology
+- `.claude/agents/` — 14 agent files copied into the project
+- `.claude/rules/` — 3 rule files copied into the project
+
+Safe to re-run after plugin updates to get new agent/rule versions.
 
 ## Setup Maestri
 
 After `/setup-project`, optionally configure Maestri terminals:
 
 ```
-/setup-maestri
+/einstein-workflow:setup-maestri
 ```
 
 This generates `.maestri/` with role definitions for each specialist terminal.
@@ -72,10 +76,29 @@ This generates `.maestri/` with role definitions for each specialist terminal.
 
 ### 4 Skills
 
-- `/setup-project` — project configuration wizard
-- `/setup-maestri` — Maestri workspace topology generator
-- `/create-migration` — database migration generator (ORM-agnostic)
-- `/create-endpoint` — REST endpoint generator (framework-agnostic)
+- `/einstein-workflow:setup-project` — project configuration wizard
+- `/einstein-workflow:setup-maestri` — Maestri workspace topology generator
+- `/einstein-workflow:create-migration` — database migration generator (ORM-agnostic)
+- `/einstein-workflow:create-endpoint` — REST endpoint generator (framework-agnostic)
+
+## Conflict Handling
+
+The plugin is designed to coexist safely with existing Claude Code configurations.
+
+### Agents
+Plugin agents are **copied** into the project's `.claude/agents/` by `/setup-project`. This avoids the Claude Code shadowing problem where project-level agents override plugin agents with the same name. If you already have agents with the same names, the wizard asks before overwriting and creates `.bak` backups.
+
+### Rules
+Claude Code **does not load rules from plugins** — only from `.claude/rules/`. The wizard copies rule files into the project. Existing rules with the same name trigger a conflict prompt.
+
+### Hooks
+Plugin hooks run **in addition to** project hooks (additive, not overriding). Identical commands are deduplicated by Claude Code automatically. If you notice double behavior (e.g., two lint passes), remove the project-level duplicate from `.claude/settings.json`.
+
+### Skills
+Plugin skills are automatically namespaced as `/einstein-workflow:skill-name`. No conflict with project skills possible.
+
+### Existing CLAUDE.md
+If the project already has a CLAUDE.md, the wizard asks before overwriting. You can merge manually or let it replace.
 
 ## Architecture
 
