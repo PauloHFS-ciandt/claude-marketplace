@@ -1,323 +1,295 @@
 # einstein-workflow
 
-AI-powered development workflow for Einstein teams. Provides Tech Lead orchestration via Maestri, specialist agents (Backend, Frontend, Mobile), AppSec security gate, brainstorm squad, and project setup wizards.
+Plugin Claude Code para times Einstein. Instala um workflow completo de desenvolvimento AI com Tech Lead, especialistas, security gate, brainstorm squad — tudo orquestrado via Maestri.
 
-## Prerequisites
+Stack-agnostic: os agents definem **metodologia**, o projeto define **contexto** via CLAUDE.md, e o claude-mem absorve os **padroes reais** do codebase.
 
-### Required
-
-- **Claude Code CLI** — `npm install -g @anthropic-ai/claude-code`
-- **Node.js >= 18**
-- **Maestri** — multi-terminal orchestrator (the Tech Lead delegates exclusively via `maestri ask`)
-
-### Required Tools
-
-#### RTK (Rust Token Killer)
-
-Token compression for Bash output — saves 60-90% tokens on dev operations.
+## Quick Start
 
 ```bash
-# Install
-curl -fsSL https://raw.githubusercontent.com/cortesi/rtk/main/install.sh | bash
+# 1. Instalar o plugin
+claude plugin install PauloHFS-ciandt/einstein-workflow
 
-# Verify
-rtk --version
-rtk gain
+# 2. Abrir o projeto
+cd seu-projeto && claude
+
+# 3. Rodar o wizard
+/einstein-workflow:setup-project
 ```
 
-RTK works automatically via the plugin's PreToolUse hook — every Bash command passes through it.
+O wizard pergunta sobre o projeto e gera:
 
-To add the RTK hook to your global settings, add to `~/.claude/settings.json`:
+- `CLAUDE.md` — contexto do projeto (stack, paths, convencoes)
+- `.claude/agents/` — 15 agents copiados para o projeto
+- `.claude/rules/` — 3 rules copiadas para o projeto
+- `.claude/settings.json` — MCP servers, permissoes, env vars
+- `.claude/WORKFLOW.md` — topologia de agents e fluxo
+
+Depois, configurar o Maestri:
+```
+/einstein-workflow:setup-maestri
+```
+
+Gera `.maestri/` com terminais: Tech Lead, Backend, Frontend, Mobile, AppSec, Shell.
+
+Seguro re-rodar apos atualizacao do plugin.
+
+---
+
+## Pre-requisitos
+
+| Ferramenta | Obrigatorio | Para que serve |
+|---|---|---|
+| **Claude Code CLI** | Sim | Runtime dos agents |
+| **Node.js >= 18** | Sim | Hooks e worker |
+| **Maestri** | Sim | Tech Lead delega via `maestri ask` |
+| **Azure CLI** (`az login`) | Se usar Azure DevOps | Auth do MCP de Azure DevOps |
+| **RTK** | Recomendado | Compressao de tokens (60-90% economia) |
+| **claude-mem** | Recomendado | Memoria persistente entre sessoes |
+
+### Instalar RTK
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/cortesi/rtk/main/install.sh | bash
+rtk --version  # verificar
+```
+
+Adicionar hook em `~/.claude/settings.json`:
 ```json
 {
   "hooks": {
     "PreToolUse": [
       {
         "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "rtk hook claude"
-          }
-        ]
+        "hooks": [{ "type": "command", "command": "rtk hook claude" }]
       }
     ]
   }
 }
 ```
 
-#### claude-mem + Custom Worker (CI&T Proxy)
+### Instalar claude-mem + Worker customizado
 
-Persistent memory across Claude Code sessions. The standard claude-mem worker **does not work** with CI&T's corporate proxy — this plugin includes a custom worker (`worker/obs-daemon.mjs`) that bypasses the SDK and calls the proxy directly via curl.
+O worker padrao do claude-mem nao funciona com o proxy da CI&T. O plugin inclui um worker customizado (`worker/obs-daemon.mjs`) que chama o proxy direto via curl.
 
-**Step 1: Install claude-mem plugin**
+**1. Instalar o plugin claude-mem:**
 ```bash
 claude plugin install claude-mem
 ```
 
-**Step 2: Configure your API key**
-
-Add to your `~/.zshrc` (the worker reads it from here):
+**2. Configurar a API key** (adicionar ao `~/.zshrc`):
 ```bash
-readonly _FLOW_PROXY_API_KEY="your-ciandt-flow-proxy-key"
+readonly _FLOW_PROXY_API_KEY="sua-chave-do-flow-proxy"
 ```
 
-Alternatively, set `FLOW_PROXY_KEY` as an env var or in `~/.claude-mem/.env`.
-
-**Step 3: Start the custom worker**
-
-Instead of `npx claude-mem start`, use the plugin's daemon:
+**3. Iniciar o worker customizado:**
 ```bash
-# Start as background daemon (auto-terminates after 30min idle)
-node /path/to/einstein-workflow/worker/obs-daemon.mjs start
+# Encontrar o path do plugin instalado
+PLUGIN_PATH=$(ls -d ~/.claude/plugins/cache/*/einstein-workflow/*/worker/obs-daemon.mjs 2>/dev/null | head -1)
 
-# Check status
-node /path/to/einstein-workflow/worker/obs-daemon.mjs status
+# Iniciar como daemon (auto-termina apos 30min idle)
+node "$PLUGIN_PATH" start
 
-# Run in foreground (debug)
-node /path/to/einstein-workflow/worker/obs-daemon.mjs run
-
-# One-shot: process all pending observations
-node /path/to/einstein-workflow/worker/obs-daemon.mjs drain
-
-# Stop daemon
-node /path/to/einstein-workflow/worker/obs-daemon.mjs stop
+# Outros comandos
+node "$PLUGIN_PATH" status   # verificar se ta rodando
+node "$PLUGIN_PATH" run      # rodar em foreground (debug)
+node "$PLUGIN_PATH" drain    # processar todas as observacoes pendentes
+node "$PLUGIN_PATH" stop     # parar
 ```
 
-**Step 4: Auto-start via SessionStart hook**
-
-Add to `~/.claude/settings.json` so the worker starts automatically:
+**4. Auto-start (opcional)** — adicionar ao `~/.claude/settings.json`:
 ```json
 {
   "hooks": {
     "SessionStart": [
       {
         "matcher": "startup",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node /path/to/einstein-workflow/worker/obs-daemon.mjs start",
-            "timeout": 5
-          }
-        ]
+        "hooks": [{
+          "type": "command",
+          "command": "node /caminho/do/plugin/worker/obs-daemon.mjs start",
+          "timeout": 5
+        }]
       }
     ]
   }
 }
 ```
 
-Replace `/path/to/einstein-workflow` with your actual plugin install path. To find it:
-```bash
-ls ~/.claude/plugins/cache/*/einstein-workflow/*/worker/obs-daemon.mjs
-```
+**5. Terminal Maestri** — criar um terminal "Shell" no workspace que roda `node .../obs-daemon.mjs run` para manter o worker ativo com logs visiveis.
 
-**Step 5: Maestri terminal**
+**Web viewer:** `http://localhost:37740`
 
-Create a dedicated "Shell" terminal in your Maestri workspace that runs:
-```bash
-node /path/to/einstein-workflow/worker/obs-daemon.mjs run
-```
-
-This keeps the worker alive with visible logs while you work.
-
-**Web viewer:** `http://localhost:37740` (while worker is running)
-
-**Configuration in `~/.claude/settings.json`:**
+Desabilitar memoria nativa do Claude Code em `~/.claude/settings.json`:
 ```json
-{
-  "env": {
-    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1"
-  }
-}
+{ "env": { "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1" } }
 ```
-
-**How it works:** The daemon polls claude-mem's SQLite DB every 30s for pending observations, sends them to the CI&T Flow proxy (`flow.ciandt.com/flow-llm-proxy`) using Claude Sonnet, and writes the generated observations back. It auto-terminates after 30min idle.
 
 ---
 
-## Quick Start
+## Arquitetura
 
-```bash
-# 1. Install the plugin
-claude plugin install /path/to/einstein-workflow
-
-# 2. Open your project
-cd your-project
-claude
-
-# 3. Run the setup wizard
-/einstein-workflow:setup-project
-```
-
-The wizard asks about your project and generates:
-- `CLAUDE.md` — project context for all agents
-- `.claude/settings.json` — MCP servers and permissions
-- `.claude/WORKFLOW.md` — team topology
-- `.claude/agents/` — 15 agent files copied into the project
-- `.claude/rules/` — 3 rule files copied into the project
-
-Safe to re-run after plugin updates to get new agent/rule versions.
-
-## Setup Maestri
-
-After `/setup-project`, configure Maestri terminals:
+3 camadas independentes:
 
 ```
-/einstein-workflow:setup-maestri
+PLUGIN (metodologia)     CLAUDE.md (contexto)     claude-mem (padroes)
+  "o que fazer"            "neste projeto"          "como se faz aqui"
+
+backend-engineer.md   +  CLAUDE.md             +  learn-codebase
+(Clean Architecture,     (Express, Sequelize,      (absorve patterns reais
+ layering rules,          src/app/controllers/,     do codigo: imports,
+ testing methodology,     PostgreSQL,               naming, estrutura,
+ security practices)      yarn, Jest)               convencoes locais)
 ```
 
-This generates `.maestri/` with role definitions for each specialist terminal:
-- **Tech Lead** — entry point, orchestrates everything
-- **Backend** — implementation specialist
-- **Frontend** — implementation specialist
-- **Mobile** — implementation specialist
-- **AppSec Engineer** — mandatory security gate before PRs
-- **Shell** — claude-mem worker
+- **Agents** = metodologia pura — zero codigo, zero nomes de lib
+- **CLAUDE.md** = contexto do projeto — gerado pelo wizard `/setup-project`
+- **claude-mem** = padroes reais — absorvidos via `/learn-codebase`
+
+Atualiza a metodologia uma vez no plugin e todos os projetos se beneficiam. Cada projeto tem seu proprio contexto, sem conflito.
 
 ---
 
-## What You Get
+## O que vem no plugin
 
 ### 15 Agents
 
-**Core Team:**
-- **tech-lead** (opus) — orchestrator, delegates via Maestri, enforces security gate
-- **backend-engineer** (sonnet) — Node.js/Express, Clean Architecture, ORM patterns
-- **frontend-engineer** (sonnet) — React/TypeScript CMS, Page-Module-Fragment layering
-- **mobile-engineer** (sonnet) — React Native/Expo, gateway pattern, migration protocol
+**Core Team (delegados via Maestri):**
 
-**Security:**
-- **security-reviewer** (sonnet) — AppSec specialist, reviews code against CI&T security checklists
+| Agent | Model | Papel |
+|---|---|---|
+| tech-lead | opus | Orquestrador — delega via Maestri, enforce security gate |
+| backend-engineer | sonnet | Especialista backend — Clean Architecture, migrations, logging |
+| frontend-engineer | sonnet | Especialista frontend — Page-Module-Fragment, forms, routing |
+| mobile-engineer | sonnet | Especialista mobile — gateways, stores, theme tokens, legacy migration |
+| security-reviewer | sonnet | AppSec — revisa codigo contra checklists CI&T |
 
-**Brainstorm Squad** (used during `/brainstorm`):
-- **api-contract-designer** — REST API surface design
-- **data-model-designer** — database schema design
-- **edge-case-hunter** — failure mode analysis
-- **integration-impact-analyst** — cross-project impact mapping
-- **po-analyst** — acceptance criteria and risk register
-- **ux-consistency-reviewer** — UX pattern consistency
+**Brainstorm Squad (usados durante `/brainstorm`):**
+
+| Agent | Papel |
+|---|---|
+| api-contract-designer | Design de superficie REST (endpoints, auth, paginacao) |
+| data-model-designer | Design de schema (entidades, indices, migrations) |
+| edge-case-hunter | Catalogo de failure modes e race conditions |
+| integration-impact-analyst | Mapa de impacto cross-projeto |
+| po-analyst | Criterios de aceite, JTBD, risk register |
+| ux-consistency-reviewer | Consistencia UX, empty/loading/error states |
 
 **Workflow:**
-- **doc-shepherd** — documentation maintenance
-- **pattern-extractor** — reusable pattern documentation
-- **plan-sync** — plan and work-plan synchronization
-- **readme-writer** — README generation
+
+| Agent | Papel |
+|---|---|
+| doc-shepherd | Mantem docs atualizados apos code changes |
+| pattern-extractor | Documenta patterns reutilizaveis |
+| plan-sync | Sincroniza plans com implementacao real |
+| readme-writer | Gera/atualiza READMEs |
 
 ### Security Gate (CI&T AppSec)
 
-Built-in security review system based on CI&T's development security checklists.
+Sistema de review de seguranca embutido. O Tech Lead enforce como gate obrigatorio antes de todo PR.
 
-**Skills (checklists):**
-- `/einstein-workflow:secure-coding` — backend coding rules (OWASP Top 10, input validation, crypto, headers)
-- `/einstein-workflow:api-security` — API security (JWT, OAuth, rate limiting, HTTPS)
-- `/einstein-workflow:frontend-security` — frontend security (XSS, CSRF, LGPD, CSP)
-- `/einstein-workflow:architecture-security` — architecture security (STRIDE, Zero Trust, DevSecOps)
+**4 checklists como skills:**
+- `/einstein-workflow:secure-coding` — OWASP Top 10, validacao, crypto, headers, cookies
+- `/einstein-workflow:api-security` — JWT, OAuth, rate limiting, HTTPS, response headers
+- `/einstein-workflow:frontend-security` — XSS, CSRF, LGPD, CSP, SRI
+- `/einstein-workflow:architecture-security` — STRIDE, Zero Trust, DevSecOps, Privacy by Design
 
-**Command:**
-- `/einstein-workflow:security-review` — runs a full security review on current changes
+**Comando:** `/einstein-workflow:security-review` — roda review completo nas mudancas atuais.
 
-**How it works:** The Tech Lead enforces a mandatory security gate before every PR. It delegates to the AppSec Engineer terminal, which uses the security-reviewer agent and applicable checklists. CRITICAL findings block the PR.
+**Fluxo:** CRITICAL bloqueia PR. WARNING deve ser resolvido ou aceito. INFO e informativo.
+
+### Azure DevOps MCP
+
+MCP oficial da Microsoft (`@azure-devops/mcp`) — embutido no plugin, zero install.
+
+**90 tools:** work items, sprints, repos, pipelines, wiki, test plans, builds, queries WIQL.
+
+**Auth:** `az login` (Azure CLI).
+
+**Config:** o wizard `/setup-project` configura automaticamente:
+```json
+{ "env": { "ADO_ORG": "sua-org", "ADO_PROJECT": "seu-projeto", "ADO_TEAM": "seu-time" } }
+```
 
 ### 4 Hooks
 
-| Hook | Event | Purpose |
+| Hook | Evento | O que faz |
 |---|---|---|
-| track-edit.mjs | PreToolUse (Edit/Write) | Tracks code vs doc edits per session |
-| doc-guard-stop.mjs | Stop | Reminds to update docs if only code changed; runs tsc |
-| block-env-edits.sh | PreToolUse (Edit/Write) | Prevents writing to .env files |
-| lint-on-edit.sh | PostToolUse (Edit/Write) | Auto-lints after file edits |
+| track-edit.mjs | PreToolUse (Edit/Write) | Rastreia edits de codigo vs docs por sessao |
+| doc-guard-stop.mjs | Stop | Lembra de atualizar docs se so codigo mudou; roda tsc |
+| block-env-edits.sh | PreToolUse (Edit/Write) | Bloqueia escrita em .env (permite .env.tpl) |
+| lint-on-edit.sh | PostToolUse (Edit/Write) | Auto-lint apos editar arquivo (detecta projeto automatico) |
 
 ### 3 Rules
 
-- **commits** — `[TICKET-XXXX] type(scope): subject` format
-- **context7-documentation** — use Context7 MCP before implementing with libraries
-- **no-unsolicited-markdown** — don't create .md files without explicit request
-
-### Azure DevOps MCP (built-in)
-
-The plugin includes Microsoft's official Azure DevOps MCP server (`@azure-devops/mcp`) — zero install, runs via npx.
-
-**What it provides:** work items, sprints, repos, pipelines, wiki, test plans, and more.
-
-**Authentication:** Run `az login` once. The MCP uses your Azure CLI credentials.
-
-**Configuration:** Set these env vars in `.claude/settings.json` (the `/setup-project` wizard does this):
-```json
-{
-  "env": {
-    "ADO_ORG": "your-org",
-    "ADO_PROJECT": "your-project",
-    "ADO_TEAM": "your-team"
-  }
-}
-```
+| Rule | O que faz |
+|---|---|
+| commits.mdc | Formato `[TICKET-XXXX] type(scope): subject`, ingles, imperative |
+| context7-documentation.mdc | Usar Context7 MCP antes de implementar com libs |
+| no-unsolicited-markdown.mdc | Nao criar .md sem pedido explicito |
 
 ### 9 Skills
 
-| Skill | Purpose |
+| Skill | O que faz |
 |---|---|
-| `/einstein-workflow:setup-project` | Project configuration wizard |
-| `/einstein-workflow:setup-maestri` | Maestri workspace topology generator |
-| `/einstein-workflow:create-migration` | Database migration generator (ORM-agnostic) |
-| `/einstein-workflow:create-endpoint` | REST endpoint generator (framework-agnostic) |
-| `/einstein-workflow:generate-spec` | SDD spec + BDD scenarios from Azure DevOps work item |
-| `/einstein-workflow:secure-coding` | CI&T secure coding checklist |
-| `/einstein-workflow:api-security` | CI&T API security checklist |
-| `/einstein-workflow:frontend-security` | CI&T frontend security checklist |
-| `/einstein-workflow:architecture-security` | CI&T architecture security checklist |
+| `/einstein-workflow:setup-project` | Wizard de configuracao do projeto |
+| `/einstein-workflow:setup-maestri` | Gerador de topologia Maestri |
+| `/einstein-workflow:create-migration` | Gerador de migration (le ORM do CLAUDE.md) |
+| `/einstein-workflow:create-endpoint` | Gerador de endpoint REST (le framework do CLAUDE.md) |
+| `/einstein-workflow:generate-spec` | Spec SDD + cenarios BDD a partir de work item Azure DevOps |
+| `/einstein-workflow:secure-coding` | Checklist secure coding CI&T |
+| `/einstein-workflow:api-security` | Checklist API security CI&T |
+| `/einstein-workflow:frontend-security` | Checklist frontend security CI&T |
+| `/einstein-workflow:architecture-security` | Checklist architecture security CI&T |
+
+### 1 Worker
+
+| Worker | O que faz |
+|---|---|
+| obs-daemon.mjs | Processa observacoes do claude-mem via proxy CI&T (substitui SDK quebrado) |
 
 ---
 
-## Conflict Handling
+## Conflitos com config existente
 
-The plugin is designed to coexist safely with existing Claude Code configurations.
-
-### Agents
-Plugin agents are **copied** into the project's `.claude/agents/` by `/setup-project`. This avoids the Claude Code shadowing problem where project-level agents override plugin agents with the same name. If you already have agents with the same names, the wizard asks before overwriting and creates `.bak` backups.
-
-### Rules
-Claude Code **does not load rules from plugins** — only from `.claude/rules/`. The wizard copies rule files into the project. Existing rules with the same name trigger a conflict prompt.
-
-### Hooks
-Plugin hooks run **in addition to** project hooks (additive, not overriding). Identical commands are deduplicated by Claude Code automatically. If you notice double behavior (e.g., two lint passes), remove the project-level duplicate from `.claude/settings.json`.
-
-### Skills
-Plugin skills are automatically namespaced as `/einstein-workflow:skill-name`. No conflict with project skills possible.
-
-### Existing CLAUDE.md
-If the project already has a CLAUDE.md, the wizard asks before overwriting. You can merge manually or let it replace.
+| Componente | Comportamento | Solucao |
+|---|---|---|
+| **Agents** | Projeto sobrescreve plugin (mesmo nome) | `/setup-project` copia pro projeto com deteccao de conflito + backup .bak |
+| **Rules** | Plugins nao distribuem rules | `/setup-project` copia pro `.claude/rules/` |
+| **Hooks** | Aditivos (ambos rodam) | Identicos sao deduplicados; remover duplicatas se notar double behavior |
+| **Skills** | Namespaced (`/einstein-workflow:*`) | Sem conflito possivel |
+| **CLAUDE.md** | Wizard pergunta antes de sobrescrever | Merge manual ou substituir |
 
 ---
 
-## Architecture
-
-Agents define the **role** (methodology, quality bars, patterns). Projects define the **context** (stack, paths, conventions) via CLAUDE.md.
+## Fluxo de trabalho
 
 ```
-Plugin (role)          +  Project (context)         =  Working Agent
-                                                 
-backend-engineer.md       CLAUDE.md                    Knows Express +
-(Clean Architecture,      (Express, Sequelize,          Sequelize patterns
- testing methodology,      src/app/controllers/,        for THIS project
- security practices)       PostgreSQL)
+Voce fala com o Tech Lead (Maestri)
+  |
+  |-- "implementa feature X no backend"
+  |     └── Tech Lead delega → Backend Engineer (maestri ask)
+  |
+  |-- "preciso de uma tela nova no mobile"
+  |     └── Tech Lead delega → Mobile Engineer (maestri ask)
+  |
+  |-- "quero fazer brainstorm dessa feature"
+  |     └── Tech Lead lanca 6 agents em paralelo
+  |         (api-contract, data-model, edge-cases, impact, PO, UX)
+  |
+  |-- "cria PR"
+  |     └── Tech Lead delega review → AppSec Engineer (obrigatorio)
+  |         Se CRITICAL → bloqueia PR
+  |         Se limpo → cria PR + link work item
+  |
+  |-- "gera spec do card #12345"
+  |     └── /einstein-workflow:generate-spec
+  |
+  |-- "review de seguranca"
+  |     └── /einstein-workflow:security-review
 ```
 
-This separation means:
-- Update methodology once in the plugin, all projects benefit
-- Each project has its own context, no conflicts
-- New projects get the full workflow with `/setup-project`
+---
 
-## Supported Stacks
+## Licenca
 
-| Layer | Frameworks |
-|---|---|
-| Backend | Express, Fastify, NestJS |
-| Frontend | React + Vite, Next.js, Vue |
-| Mobile | React Native + Expo, bare React Native |
-| ORM | Sequelize, Prisma, TypeORM |
-| Database | PostgreSQL, MySQL, MongoDB |
-| Testing | Jest |
-
-## License
-
-Internal — Hospital Israelita Albert Einstein
+Uso interno — Hospital Israelita Albert Einstein / CI&T
