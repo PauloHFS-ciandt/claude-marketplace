@@ -233,7 +233,26 @@ Built-in security review system based on CI&T's development security checklists.
 - **context7-documentation** — use Context7 MCP before implementing with libraries
 - **no-unsolicited-markdown** — don't create .md files without explicit request
 
-### 8 Skills
+### Azure DevOps MCP (built-in)
+
+The plugin includes Microsoft's official Azure DevOps MCP server (`@azure-devops/mcp`) — zero install, runs via npx.
+
+**What it provides:** work items, sprints, repos, pipelines, wiki, test plans, and more.
+
+**Authentication:** Run `az login` once. The MCP uses your Azure CLI credentials.
+
+**Configuration:** Set these env vars in `.claude/settings.json` (the `/setup-project` wizard does this):
+```json
+{
+  "env": {
+    "ADO_ORG": "your-org",
+    "ADO_PROJECT": "your-project",
+    "ADO_TEAM": "your-team"
+  }
+}
+```
+
+### 9 Skills
 
 | Skill | Purpose |
 |---|---|
@@ -241,6 +260,7 @@ Built-in security review system based on CI&T's development security checklists.
 | `/einstein-workflow:setup-maestri` | Maestri workspace topology generator |
 | `/einstein-workflow:create-migration` | Database migration generator (ORM-agnostic) |
 | `/einstein-workflow:create-endpoint` | REST endpoint generator (framework-agnostic) |
+| `/einstein-workflow:generate-spec` | SDD spec + BDD scenarios from Azure DevOps work item |
 | `/einstein-workflow:secure-coding` | CI&T secure coding checklist |
 | `/einstein-workflow:api-security` | CI&T API security checklist |
 | `/einstein-workflow:frontend-security` | CI&T frontend security checklist |

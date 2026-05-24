@@ -2,6 +2,16 @@
   "name": "einstein-workflow",
   "version": "1.0.0",
   "description": "AI-powered development workflow for Einstein teams. Provides Tech Lead orchestration, specialist agents (Backend, Frontend, Mobile), brainstorm squad, security gates, and project setup wizards for Maestri + Claude Code.",
+  "mcpServers": {
+    "ado": {
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp", "${ADO_ORG}"],
+      "env": {
+        "ado_mcp_project": "${ADO_PROJECT}",
+        "ado_mcp_team": "${ADO_TEAM}"
+      }
+    }
+  },
   "hooks": {
     "PreToolUse": [
       {

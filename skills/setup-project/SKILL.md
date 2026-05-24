@@ -50,7 +50,21 @@ Ask the user the following questions using `AskUserQuestion`. Group related ques
 
 **Round 5 — MCP Servers (optional):**
 - Do you have Jest test projects that should have MCP servers? If yes, which sub-projects?
-- Do you want Azure Boards MCP? (only if Azure DevOps was configured)
+
+Note: Azure DevOps MCP is already included in the plugin via `plugin.json`. The user just needs to configure `ADO_ORG`, `ADO_PROJECT`, and `ADO_TEAM` environment variables. The `/setup-project` wizard handles this if the user provided Azure DevOps config in Round 4.
+
+To configure, add to the project's `.claude/settings.json`:
+```json
+{
+  "env": {
+    "ADO_ORG": "{org from Round 4}",
+    "ADO_PROJECT": "{project from Round 4}",
+    "ADO_TEAM": "{team from Round 4}"
+  }
+}
+```
+
+The user also needs to authenticate once via `az login` (Azure CLI) for the MCP to work.
 
 ### Step 2: Generate CLAUDE.md
 
@@ -177,6 +191,11 @@ Create `.claude/settings.json` with:
       "Bash({package_manager} lint *)"
     ]
   },
+  "env": {
+    "ADO_ORG": "{org from Round 4, if configured}",
+    "ADO_PROJECT": "{project from Round 4}",
+    "ADO_TEAM": "{team from Round 4}"
+  },
   "mcpServers": {
     // Only if Jest MCP was requested:
     "jest-{subproject}": {
@@ -185,23 +204,15 @@ Create `.claude/settings.json` with:
       "env": {
         "PROJECT_ROOT": "{absolute_path_to_subproject}"
       }
-    },
-    // Only if Azure Boards MCP was requested:
-    "azure-boards": {
-      "command": "node",
-      "args": ["{azure_boards_mcp_path}"],
-      "env": {
-        "AZURE_DEVOPS_ORG": "{org}",
-        "AZURE_DEVOPS_PROJECT": "{project}",
-        "AZURE_DEVOPS_TEAM": "{team}",
-        "AZURE_DEVOPS_PAT": "${AZURE_DEVOPS_PAT}"
-      }
     }
   }
 }
 ```
 
-**Important:** For MCP servers, ask the user for the actual path to the MCP server scripts. If they don't have them yet, leave comments with TODO instructions.
+**Notes on MCP servers:**
+- **Azure DevOps** is already configured in the plugin's `plugin.json` — no need to add it here. Just set the `ADO_ORG`, `ADO_PROJECT`, `ADO_TEAM` env vars above.
+- **Jest MCP** requires a local jest-mcp server. Ask the user for the path. If they don't have one, leave a TODO comment.
+- The user needs to run `az login` once to authenticate with Azure DevOps.
 
 ### Step 4: Generate .claude/WORKFLOW.md
 
