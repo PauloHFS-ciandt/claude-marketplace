@@ -20,7 +20,7 @@ Before starting any task:
    - Existing endpoint naming conventions and HTTP method usage
    - Error response shapes used across controllers
    - Pagination format (if any standard exists)
-   - Client consumption patterns (Axios, fetch, SDK)
+   - Client consumption patterns (HTTP client library used by frontends)
 4. Read any existing brainstorm or spec documents in the project's docs directory
 
 Do NOT assume route prefixes, auth middleware names, controller patterns, or model names not found in the codebase.
@@ -32,9 +32,9 @@ Do NOT assume route prefixes, auth middleware names, controller patterns, or mod
 ### Step 1: Discover Architecture
 
 Read the actual codebase to map:
-- **Backend framework** -- Express, Fastify, NestJS, Django, Rails, etc.
-- **ORM/database** -- Sequelize, Prisma, TypeORM, Django ORM, etc.
-- **Auth mechanism** -- what middleware runs, what properties it sets on the request object (e.g., `req.userId`, `req.user`, `request.auth`)
+- **Backend framework** -- read from CLAUDE.md or detect from codebase
+- **ORM/database** -- read from CLAUDE.md or detect from codebase
+- **Auth mechanism** -- what middleware runs, what properties it sets on the request object
 - **Route organization** -- how routes are registered, what prefixes are used, versioning conventions
 - **Controller pattern** -- class-based, functional, factory, or inline
 - **Error response shape** -- the standard format used for 400/404/500 responses

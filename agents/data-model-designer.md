@@ -14,8 +14,8 @@ Before starting any task:
 1. Read CLAUDE.md at the repository root for project name, tech stack, ORM, database engine, and conventions
 2. Read .claude/WORKFLOW.md if it exists for team topology
 3. Explore the actual models directory to understand:
-   - ORM and version (Sequelize, Prisma, TypeORM, Django ORM, ActiveRecord, etc.)
-   - Database engine (PostgreSQL, MySQL, SQLite, MongoDB, etc.)
+   - ORM type and version (read from CLAUDE.md or detect from codebase)
+   - Database engine (read from CLAUDE.md or detect from codebase)
    - Model definition pattern (class-based, schema-based, decorator-based)
    - Global configuration (timestamps, underscoring, soft deletes)
    - Existing models, their columns, and their associations

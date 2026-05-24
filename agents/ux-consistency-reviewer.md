@@ -73,7 +73,7 @@ Flag any state that is missing from the proposed design.
 
 Check platform-specific concerns relevant to the project's tech stack:
 
-**For mobile apps (React Native, Flutter, etc.):**
+**For mobile apps:**
 - Safe area handling (notch, status bar, bottom navigation)
 - iOS vs Android behavioral differences
 - Touch targets (minimum 44x44pt)
