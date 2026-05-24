@@ -158,13 +158,12 @@ Built-in security review system based on CI&T's development security checklists.
 
 **How it works:** The Tech Lead enforces a mandatory security gate before every PR. It delegates to the AppSec Engineer terminal, which uses the security-reviewer agent and applicable checklists. CRITICAL findings block the PR.
 
-### 5 Hooks
+### 4 Hooks
 
 | Hook | Event | Purpose |
 |---|---|---|
-| notification.mjs | Notification | macOS terminal notification |
-| track-edit.mjs | PreToolUse (Edit/Write) | Tracks code vs doc edits |
-| doc-guard-stop.mjs | Stop | Reminds to update docs; runs tsc |
+| track-edit.mjs | PreToolUse (Edit/Write) | Tracks code vs doc edits per session |
+| doc-guard-stop.mjs | Stop | Reminds to update docs if only code changed; runs tsc |
 | block-env-edits.sh | PreToolUse (Edit/Write) | Prevents writing to .env files |
 | lint-on-edit.sh | PostToolUse (Edit/Write) | Auto-lints after file edits |
 
