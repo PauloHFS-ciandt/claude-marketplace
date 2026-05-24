@@ -46,21 +46,81 @@ To add the RTK hook to your global settings, add to `~/.claude/settings.json`:
 }
 ```
 
-#### claude-mem
+#### claude-mem + Custom Worker (CI&T Proxy)
 
-Persistent memory across Claude Code sessions — observations, decisions, and discoveries are recorded and available in future sessions.
+Persistent memory across Claude Code sessions. The standard claude-mem worker **does not work** with CI&T's corporate proxy — this plugin includes a custom worker (`worker/obs-daemon.mjs`) that bypasses the SDK and calls the proxy directly via curl.
 
+**Step 1: Install claude-mem plugin**
 ```bash
-# Install the plugin
 claude plugin install claude-mem
-
-# Start the worker (must be running for memory recording)
-npx claude-mem start
 ```
 
-**Maestri setup:** Create a dedicated "Shell" terminal in your Maestri workspace that runs `npx claude-mem start`. This keeps the worker alive while you work.
+**Step 2: Configure your API key**
 
-**Web viewer:** Access your memory at `http://localhost:37740` while the worker is running.
+Add to your `~/.zshrc` (the worker reads it from here):
+```bash
+readonly _FLOW_PROXY_API_KEY="your-ciandt-flow-proxy-key"
+```
+
+Alternatively, set `FLOW_PROXY_KEY` as an env var or in `~/.claude-mem/.env`.
+
+**Step 3: Start the custom worker**
+
+Instead of `npx claude-mem start`, use the plugin's daemon:
+```bash
+# Start as background daemon (auto-terminates after 30min idle)
+node /path/to/einstein-workflow/worker/obs-daemon.mjs start
+
+# Check status
+node /path/to/einstein-workflow/worker/obs-daemon.mjs status
+
+# Run in foreground (debug)
+node /path/to/einstein-workflow/worker/obs-daemon.mjs run
+
+# One-shot: process all pending observations
+node /path/to/einstein-workflow/worker/obs-daemon.mjs drain
+
+# Stop daemon
+node /path/to/einstein-workflow/worker/obs-daemon.mjs stop
+```
+
+**Step 4: Auto-start via SessionStart hook**
+
+Add to `~/.claude/settings.json` so the worker starts automatically:
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /path/to/einstein-workflow/worker/obs-daemon.mjs start",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Replace `/path/to/einstein-workflow` with your actual plugin install path. To find it:
+```bash
+ls ~/.claude/plugins/cache/*/einstein-workflow/*/worker/obs-daemon.mjs
+```
+
+**Step 5: Maestri terminal**
+
+Create a dedicated "Shell" terminal in your Maestri workspace that runs:
+```bash
+node /path/to/einstein-workflow/worker/obs-daemon.mjs run
+```
+
+This keeps the worker alive with visible logs while you work.
+
+**Web viewer:** `http://localhost:37740` (while worker is running)
 
 **Configuration in `~/.claude/settings.json`:**
 ```json
@@ -71,7 +131,7 @@ npx claude-mem start
 }
 ```
 
-claude-mem replaces Claude's built-in memory with a more powerful cross-session observation system.
+**How it works:** The daemon polls claude-mem's SQLite DB every 30s for pending observations, sends them to the CI&T Flow proxy (`flow.ciandt.com/flow-llm-proxy`) using Claude Sonnet, and writes the generated observations back. It auto-terminates after 30min idle.
 
 ---
 
