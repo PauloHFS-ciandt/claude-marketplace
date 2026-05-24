@@ -20,7 +20,7 @@ cd seu-projeto && claude
 O wizard pergunta sobre o projeto e gera:
 
 - `CLAUDE.md` — contexto do projeto (stack, paths, convencoes)
-- `.claude/agents/` — 15 agents copiados para o projeto
+- `.claude/agents/` — 16 agents copiados para o projeto
 - `.claude/rules/` — 3 rules copiadas para o projeto
 - `.claude/settings.json` — MCP servers, permissoes, env vars
 - `.claude/WORKFLOW.md` — topologia de agents e fluxo
@@ -151,7 +151,7 @@ Atualiza a metodologia uma vez no plugin e todos os projetos se beneficiam. Cada
 
 ## O que vem no plugin
 
-### 15 Agents
+### 16 Agents
 
 **Core Team (delegados via Maestri):**
 
@@ -162,6 +162,7 @@ Atualiza a metodologia uma vez no plugin e todos os projetos se beneficiam. Cada
 | frontend-engineer | sonnet | Especialista frontend — Page-Module-Fragment, forms, routing |
 | mobile-engineer | sonnet | Especialista mobile — gateways, stores, theme tokens, legacy migration |
 | security-reviewer | sonnet | AppSec — revisa codigo contra checklists CI&T |
+| lexicon | sonnet | Prompt Engineer — analisa, otimiza e refina prompts de agents, skills, CLAUDE.md |
 
 **Brainstorm Squad (usados durante `/brainstorm`):**
 

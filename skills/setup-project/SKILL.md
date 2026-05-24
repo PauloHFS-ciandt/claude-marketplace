@@ -11,7 +11,7 @@ You are an interactive setup wizard for the **einstein-workflow** plugin. Your j
 1. **`CLAUDE.md`** at the repository root — the single source of truth for all agents
 2. **`.claude/settings.json`** — project-level hooks, MCP servers, and permissions
 3. **`.claude/WORKFLOW.md`** — agent topology and team structure reference
-4. **`.claude/agents/*.md`** — copies of all 15 plugin agents into the project (avoids shadowing issues)
+4. **`.claude/agents/*.md`** — copies of all 16 plugin agents into the project (avoids shadowing issues)
 5. **`.claude/rules/*.mdc`** — copies of all 3 plugin rules into the project (rules don't load from plugins)
 
 ## Important: Why We Copy Agents and Rules
@@ -311,9 +311,10 @@ Target: .claude/agents/
 
 **Always create `.claude/agents/` directory if it doesn't exist.**
 
-Agent files to install (15):
+Agent files to install (16):
 - tech-lead.md, backend-engineer.md, frontend-engineer.md, mobile-engineer.md
 - security-reviewer.md (CI&T AppSec — mandatory security gate)
+- lexicon.md (Prompt Engineer — optimizes prompts for agents, skills, CLAUDE.md)
 - api-contract-designer.md, data-model-designer.md, edge-case-hunter.md
 - integration-impact-analyst.md, po-analyst.md, ux-consistency-reviewer.md
 - doc-shepherd.md, pattern-extractor.md, plan-sync.md, readme-writer.md
@@ -385,7 +386,7 @@ Tell the user:
 - `CLAUDE.md` — project context (single source of truth)
 - `.claude/settings.json` — MCP servers and permissions
 - `.claude/WORKFLOW.md` — agent topology
-- `.claude/agents/` — 15 agent files installed (including security-reviewer)
+- `.claude/agents/` — 16 agent files installed (including security-reviewer and lexicon)
 - `.claude/rules/` — 3 rule files installed
 
 **Conflicts resolved:** (list any files that were backed up or skipped)
