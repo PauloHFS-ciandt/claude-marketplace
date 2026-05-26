@@ -49,24 +49,7 @@ Seguro re-rodar apos atualizacao do plugin.
 
 ### Instalar RTK
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/cortesi/rtk/main/install.sh | bash
-rtk --version  # verificar
-```
-
-Adicionar hook em `~/.claude/settings.json`:
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [{ "type": "command", "command": "rtk hook claude" }]
-      }
-    ]
-  }
-}
-```
+Verifique o guia de instalação no repositorio oficial: [rtk-ai/rtk](https://github.com/rtk-ai/rtk)
 
 ### Instalar claude-mem + Worker customizado
 
