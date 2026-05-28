@@ -11,21 +11,24 @@ Abra o Maestri, crie um terminal Claude Code no seu projeto, e cole isto:
 > Install and configure einstein-workflow by following the instructions here:
 > https://raw.githubusercontent.com/PauloHFS-ciandt/einstein-workflow/main/docs/install.md
 
-O agente instala o plugin, configura o projeto, e monta o workspace do Maestri automaticamente — terminais, conexoes, roles, tudo no canvas.
+O agente registra o marketplace, instala o plugin, configura o projeto, e monta o workspace do Maestri automaticamente — terminais, conexoes, roles, tudo no canvas.
 
 ### Setup manual (alternativa)
 
 ```bash
-# 1. Instalar o plugin
-claude plugin install PauloHFS-ciandt/einstein-workflow
+# 1. Registrar o marketplace (uma vez)
+claude plugin marketplace add PauloHFS-ciandt/einstein-workflow
 
-# 2. Abrir o projeto
+# 2. Instalar o plugin
+claude plugin install einstein-workflow
+
+# 3. Abrir o projeto
 cd seu-projeto && claude
 
-# 3. Configurar projeto
+# 4. Configurar projeto
 /einstein-workflow:setup-project
 
-# 4. Montar workspace Maestri
+# 5. Montar workspace Maestri
 /einstein-workflow:setup-maestri
 ```
 
@@ -39,6 +42,20 @@ O wizard gera:
 - Terminais Maestri: Tech Lead, Backend, Frontend, Mobile, AppSec
 
 Seguro re-rodar apos atualizacao do plugin.
+
+### Atualizando
+
+```bash
+# 1. Atualizar o indice do marketplace (pull do repo)
+claude plugin marketplace update einstein-workflow
+
+# 2. Atualizar o plugin
+claude plugin update einstein-workflow
+
+# 3. Reiniciar o Claude Code para aplicar
+```
+
+Agents e rules copiados para o `.claude/` do projeto **nao atualizam automaticamente** — re-rode `/einstein-workflow:setup-project` para pegar as versoes novas (o wizard detecta conflitos e faz backup `.bak` antes de sobrescrever).
 
 ---
 
@@ -74,7 +91,7 @@ readonly _FLOW_PROXY_API_KEY="sua-chave-do-flow-proxy"
 **3. Iniciar o worker customizado:**
 ```bash
 # Encontrar o path do plugin instalado
-PLUGIN_PATH=$(ls -d ~/.claude/plugins/cache/*/einstein-workflow/*/worker/obs-daemon.mjs 2>/dev/null | head -1)
+PLUGIN_PATH=$(find ~/.claude/plugins -path "*/einstein-workflow/worker/obs-daemon.mjs" 2>/dev/null | head -1)
 
 # Iniciar como daemon (auto-termina apos 30min idle)
 node "$PLUGIN_PATH" start

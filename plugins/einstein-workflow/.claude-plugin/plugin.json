@@ -2,6 +2,11 @@
   "name": "einstein-workflow",
   "version": "1.0.0",
   "description": "AI-powered development workflow for Einstein teams. Provides Tech Lead orchestration, specialist agents (Backend, Frontend, Mobile), brainstorm squad, security gates, and project setup wizards for Maestri + Claude Code.",
+  "author": {
+    "name": "Paulo Hernane Ferreira <paulohf@ciandt.com>"
+  },
+  "license": "PROPRIETARY",
+  "repository": "https://github.com/PauloHFS-ciandt/einstein-workflow",
   "mcpServers": {
     "ado": {
       "command": "npx",

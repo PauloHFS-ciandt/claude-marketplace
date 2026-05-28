@@ -1,0 +1,16 @@
+{
+  "name": "einstein-workflow",
+  "description": "AI-powered development workflow for Einstein teams. Provides Tech Lead orchestration, specialist agents, security gates, and project setup wizards for Maestri + Claude Code.",
+  "owner": {
+    "name": "Paulo Hernane Ferreira",
+    "email": "paulohf@ciandt.com"
+  },
+  "plugins": [
+    {
+      "name": "einstein-workflow",
+      "description": "AI-powered development workflow for Einstein teams. Provides Tech Lead orchestration, specialist agents (Backend, Frontend, Mobile), brainstorm squad, security gates, and project setup wizards for Maestri + Claude Code.",
+      "source": "./plugins/einstein-workflow",
+      "category": "workflow"
+    }
+  ]
+}

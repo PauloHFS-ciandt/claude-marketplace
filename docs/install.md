@@ -2,15 +2,29 @@
 
 You are configuring the einstein-workflow plugin for the current project. Follow each step in order. Do NOT skip steps. Ask the user for input when indicated.
 
-## Step 1: Install the Plugin
+## Step 1: Add Marketplace and Install Plugin
 
-Run this command to install the plugin:
+First, register the einstein-workflow GitHub repository as a plugin marketplace, then install the plugin:
 
 ```bash
-claude plugin install PauloHFS-ciandt/einstein-workflow
+claude plugin marketplace add PauloHFS-ciandt/einstein-workflow
+claude plugin install einstein-workflow
 ```
 
-If the user already has it installed, this is a no-op. Move on.
+If the marketplace is already added, the first command is a no-op. Same for the plugin if already installed.
+
+**Updating an existing installation:**
+
+If the plugin is already installed and needs updating, run:
+
+```bash
+claude plugin marketplace update einstein-workflow
+claude plugin update einstein-workflow
+```
+
+Then re-run `/einstein-workflow:setup-project` in each project to update the agents and rules copied to `.claude/` (the wizard detects conflicts and backs up existing files before overwriting).
+
+Move on.
 
 ## Step 2: Run Project Setup
 
@@ -112,9 +126,9 @@ If yes:
    }
    ```
 
-3. Copy the daemon script:
+3. Copy the daemon script from the installed plugin:
    ```bash
-   PLUGIN_PATH=$(ls -d ~/.claude/plugins/cache/*/einstein-workflow/*/worker/obs-daemon.mjs 2>/dev/null | head -1)
+   PLUGIN_PATH=$(find ~/.claude/plugins -path "*/einstein-workflow/worker/obs-daemon.mjs" 2>/dev/null | head -1)
    cp "$PLUGIN_PATH" ~/.claude/hooks/obs-daemon.mjs
    ```
 
