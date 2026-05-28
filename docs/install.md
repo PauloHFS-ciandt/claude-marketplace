@@ -39,21 +39,14 @@ This generates the project's CLAUDE.md, copies agents, rules, and configures set
 /einstein-workflow:setup-project
 ```
 
-**If the skill returns "Unknown skill"** (this happens when the plugin was just installed in the same session), read and execute the skill instructions directly from the plugin cache:
+**If the skill returns "Unknown skill"** (this happens when the plugin was just installed in the same session), locate the plugin cache and execute the wizard directly:
 
 ```bash
-SKILL_FILE=$(find ~/.claude/plugins -path "*/einstein-workflow/skills/setup-project/SKILL.md" 2>/dev/null | head -1)
-echo "Skill file: $SKILL_FILE"
-```
-
-Read that file with the Read tool and follow its instructions step by step. The SKILL.md contains the full interactive wizard — execute each step as written. The plugin root for agent/rule file copies is the parent of the `skills/` directory:
-
-```bash
-PLUGIN_ROOT=$(dirname "$(dirname "$SKILL_FILE")")
+PLUGIN_ROOT=$(ls -d ~/.claude/plugins/cache/einstein-workflow/einstein-workflow/*/  2>/dev/null | head -1)
 echo "Plugin root: $PLUGIN_ROOT"
 ```
 
-Use `$PLUGIN_ROOT` wherever the SKILL.md references `${CLAUDE_PLUGIN_ROOT}`.
+Then read `${PLUGIN_ROOT}skills/setup-project/SKILL.md` with the Read tool and follow its instructions step by step. Use `$PLUGIN_ROOT` wherever the SKILL.md references `${CLAUDE_PLUGIN_ROOT}`.
 
 ## Step 3: Verify Maestri Connection
 
@@ -76,14 +69,7 @@ Wait for the user to confirm before continuing.
 /einstein-workflow:setup-maestri
 ```
 
-**If the skill returns "Unknown skill"**, read and execute from the plugin cache (same approach as Step 2):
-
-```bash
-SKILL_FILE=$(find ~/.claude/plugins -path "*/einstein-workflow/skills/setup-maestri/SKILL.md" 2>/dev/null | head -1)
-echo "Skill file: $SKILL_FILE"
-```
-
-Read that file with the Read tool and follow its instructions step by step.
+**If the skill returns "Unknown skill"**, use the same `$PLUGIN_ROOT` from Step 2. Read `${PLUGIN_ROOT}skills/setup-maestri/SKILL.md` with the Read tool and follow its instructions step by step.
 
 ## Step 5: Verify
 
