@@ -153,18 +153,20 @@ Create each terminal on the canvas. Run these **sequentially** with a 2-second p
 
 **Model assignment:** Tech Lead runs on **Opus** (orchestration needs the strongest model). All specialists run on **Sonnet** (implementation tasks, cost-efficient).
 
+**IMPORTANT:** The model ID contains `[1m]` which zsh interprets as a glob pattern. You MUST wrap the model ID in quotes inside the `--command` value. Use single quotes for the inner value to avoid shell expansion:
+
 ```bash
 # Tech Lead = Opus
-maestri recruit "Tech Lead" --preset "Claude Code" --role "{ProjectName} - Tech Lead" --command "claude --model anthropic.claude-4-6-opus[1m]"
+maestri recruit "Tech Lead" --preset "Claude Code" --role "{ProjectName} - Tech Lead" --command 'claude --model "anthropic.claude-4-6-opus[1m]"'
 sleep 2
 # Specialists = Sonnet
-maestri recruit "Backend" --preset "Claude Code" --role "{ProjectName} - Backend Engineer" --command "claude --model anthropic.claude-4.6-sonnet[1m]"
+maestri recruit "Backend" --preset "Claude Code" --role "{ProjectName} - Backend Engineer" --command 'claude --model "anthropic.claude-4.6-sonnet[1m]"'
 sleep 2
-maestri recruit "Frontend" --preset "Claude Code" --role "{ProjectName} - Frontend Engineer" --command "claude --model anthropic.claude-4.6-sonnet[1m]"
+maestri recruit "Frontend" --preset "Claude Code" --role "{ProjectName} - Frontend Engineer" --command 'claude --model "anthropic.claude-4.6-sonnet[1m]"'
 sleep 2
-maestri recruit "Mobile" --preset "Claude Code" --role "{ProjectName} - Mobile Engineer" --command "claude --model anthropic.claude-4.6-sonnet[1m]"
+maestri recruit "Mobile" --preset "Claude Code" --role "{ProjectName} - Mobile Engineer" --command 'claude --model "anthropic.claude-4.6-sonnet[1m]"'
 sleep 2
-maestri recruit "AppSec" --preset "Claude Code" --role "{ProjectName} - AppSec Engineer" --command "claude --model anthropic.claude-4.6-sonnet[1m]"
+maestri recruit "AppSec" --preset "Claude Code" --role "{ProjectName} - AppSec Engineer" --command 'claude --model "anthropic.claude-4.6-sonnet[1m]"'
 ```
 
 If Shell was selected:
@@ -205,12 +207,18 @@ Create a browser portal on the canvas and connect it to the Frontend terminal. T
    
    If you can't determine the port, use `http://localhost:5173` as default.
 
-2. **Create and connect the portal:**
+2. **Create the portal and connect it to Frontend:**
    ```bash
    maestri portal create "{dev_server_url}" "Frontend Preview"
+   ```
+   
+   **Note:** `portal create` auto-connects the portal to the current terminal (the installer). You MUST also explicitly connect it to the Frontend terminal:
+   ```bash
    sleep 2
    maestri connect "Frontend" "Frontend Preview"
    ```
+   
+   After setup, verify the connection with `maestri list` — "Frontend Preview" should appear connected to "Frontend".
 
 The portal appears on the canvas as a browser window. The Frontend Engineer can use `maestri portal snapshot`, `maestri portal screenshot`, and other portal commands to inspect the UI while implementing.
 

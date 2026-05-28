@@ -29,7 +29,14 @@ claude plugin update einstein-workflow@einstein-workflow
 
 Then re-run `/einstein-workflow:setup-project` in each project to update the agents and rules copied to `.claude/` (the wizard detects conflicts and backs up existing files before overwriting).
 
-**After installing or updating:** skills may not be available until the Claude Code session is restarted. If `/einstein-workflow:setup-project` returns "Unknown skill", tell the user to restart Claude Code and re-run this setup.
+**After installing or updating:** skills may not be available until the Claude Code session is restarted. If `/einstein-workflow:setup-project` returns "Unknown skill", tell the user:
+
+> The plugin was installed but skills aren't loaded yet. Please restart Claude Code (`exit` then `claude`) and paste this prompt again:
+> 
+> Install and configure einstein-workflow by following the instructions here:
+> https://raw.githubusercontent.com/PauloHFS-ciandt/einstein-workflow/main/docs/install.md
+
+Then STOP — do not continue. The fresh session will pick up from Step 2.
 
 Move on to Step 2.
 
