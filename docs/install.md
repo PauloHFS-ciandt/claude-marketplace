@@ -2,7 +2,34 @@
 
 You are configuring the einstein-workflow plugin for the current project. Follow each step in order. Do NOT skip steps. Do NOT improvise commands — run EXACTLY what is shown below. Ask the user for input when indicated.
 
-**CRITICAL: Execute ALL steps (1 through 6) in a single session without stopping.** Do NOT pause after any step to ask the user what to do next. Do NOT present "next steps" — just continue to the next step automatically. The user expects to paste one prompt and have everything configured end-to-end.
+**CRITICAL: Execute ALL steps (0 through 5) in a single session without stopping.** Do NOT pause after any step to ask the user what to do next. Do NOT present "next steps" — just continue to the next step automatically. The user expects to paste one prompt and have everything configured end-to-end.
+
+## Step 0: Check Prerequisites
+
+Before starting, verify that the required tools are installed. Run these checks and report any missing tools to the user **before** proceeding:
+
+```bash
+# Required
+claude --version 2>/dev/null || echo "MISSING: Claude Code CLI"
+node --version 2>/dev/null || echo "MISSING: Node.js"
+($MAESTRI_CLI list 2>/dev/null || maestri list 2>/dev/null) || echo "MISSING: Maestri (or terminal not on canvas)"
+
+# Recommended (not blocking)
+which rtk 2>/dev/null && rtk --version 2>/dev/null || echo "OPTIONAL: RTK not installed — saves 60-90% tokens. Install: https://github.com/rtk-ai/rtk"
+claude plugin list 2>&1 | grep -q claude-mem || echo "OPTIONAL: claude-mem not installed — persistent memory. Install: claude plugin install claude-mem"
+```
+
+| Tool | Required? | Purpose | Install |
+|------|-----------|---------|---------|
+| **Claude Code CLI** | Yes | Runtime | Already running if you see this |
+| **Node.js >= 18** | Yes | Hooks and worker scripts | https://nodejs.org |
+| **Maestri** | Yes | Multi-terminal orchestration | https://www.themaestri.app |
+| **RTK** | Recommended | Token compression (60-90% savings) | https://github.com/rtk-ai/rtk |
+| **claude-mem** | Recommended | Persistent memory across sessions | `claude plugin install claude-mem` |
+
+**If any REQUIRED tool is missing**, tell the user what to install and STOP. Do NOT continue without all required tools.
+
+**If only RECOMMENDED tools are missing**, note them in the output and continue — the wizard will detect and configure them later (Step 2, Step 9 of setup-project).
 
 ## Step 1: Add Marketplace and Install Plugin
 
@@ -50,22 +77,9 @@ echo "Plugin root: $PLUGIN_ROOT"
 
 Then read `${PLUGIN_ROOT}skills/setup-project/SKILL.md` with the Read tool and follow its instructions step by step. Use `$PLUGIN_ROOT` wherever the SKILL.md references `${CLAUDE_PLUGIN_ROOT}`.
 
-**After setup-project completes, immediately continue to Step 3. Do NOT stop here. Do NOT present "next steps" to the user. Do NOT suggest running /setup-maestri as a next step — YOU will run it in Step 4.**
+**After setup-project completes, immediately continue to Step 3. Do NOT stop here. Do NOT present "next steps" to the user. Do NOT suggest running /setup-maestri as a next step — YOU will run it in Step 3.**
 
-## Step 3: Verify Maestri Connection
-
-Check that this terminal is on the Maestri canvas. The CLI may be available as `$MAESTRI_CLI` (env var set by Maestri) or `maestri` (in PATH). Try both:
-
-```bash
-$MAESTRI_CLI list 2>/dev/null || maestri list 2>/dev/null
-```
-
-If BOTH fail, tell the user:
-> Open the Maestri app and make sure this terminal is on a Maestri canvas. Then say "continue" and I'll proceed.
-
-Wait for the user to confirm before continuing.
-
-## Step 4: Set Up Maestri Workspace
+## Step 3: Set Up Maestri Workspace
 
 **First, try running the skill directly:**
 
@@ -75,7 +89,7 @@ Wait for the user to confirm before continuing.
 
 **If the skill returns "Unknown skill"**, use the same `$PLUGIN_ROOT` from Step 2. Read `${PLUGIN_ROOT}skills/setup-maestri/SKILL.md` with the Read tool and follow its instructions step by step.
 
-## Step 5: Verify
+## Step 4: Verify
 
 Run `$MAESTRI_CLI list` (or `maestri list`) and confirm the terminals and portals appear. You should see entries like:
 - Tech Lead
@@ -86,7 +100,7 @@ Run `$MAESTRI_CLI list` (or `maestri list`) and confirm the terminals and portal
 
 If any are missing, report the issue to the user.
 
-## Step 6: Report
+## Step 5: Report
 
 Tell the user:
 
@@ -105,4 +119,4 @@ Tell the user:
 > maestri ask "Tech Lead" "what can you help me with?"
 > ```
 
-**Note:** RTK, claude-mem, and Maestri detection/configuration is handled automatically by the setup-project wizard (Step 10 of the SKILL.md). No manual setup needed here.
+**Note:** RTK, claude-mem, and Maestri detection/configuration is handled automatically by the setup-project wizard (Step 9 of the SKILL.md). No manual setup needed here.
