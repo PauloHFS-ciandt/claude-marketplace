@@ -356,7 +356,62 @@ After generating the files, **explore the actual codebase** to fill in:
 - Path aliases (read tsconfig.json or babel.config.js)
 - Environment variables (read .env.tpl or .env.example)
 
-### Step 10: Summary
+### Step 10: Detect Optional Tools
+
+Check for recommended tools and configure what's already installed. Report what's missing.
+
+**10a. RTK (Token Compression)**
+
+```bash
+which rtk 2>/dev/null && rtk --version 2>/dev/null
+```
+
+- **If found:** No action needed. The user's global CLAUDE.md should already have RTK instructions. Just note "RTK detected" in the summary.
+- **If NOT found:** Add to the summary:
+  > **RTK not installed** (recommended). Saves 60-90% tokens on CLI output. Install: https://github.com/rtk-ai/rtk
+
+**10b. claude-mem (Persistent Memory)**
+
+```bash
+claude plugin list 2>&1 | grep claude-mem
+```
+
+- **If found:** Note "claude-mem detected" in the summary. Then ask: "Do you use CI&T's Flow proxy? (yes/no)"
+  - If **yes**: check if `_FLOW_PROXY_API_KEY` is set in the environment or `~/.zshrc`. If set, copy the custom worker and configure the SessionStart hook:
+    ```bash
+    PLUGIN_PATH=$(find ~/.claude/plugins -path "*/einstein-workflow/worker/obs-daemon.mjs" 2>/dev/null | head -1)
+    if [ -n "$PLUGIN_PATH" ]; then
+      cp "$PLUGIN_PATH" ~/.claude/hooks/obs-daemon.mjs
+      echo "Worker copied to ~/.claude/hooks/obs-daemon.mjs"
+    fi
+    ```
+    Then add the SessionStart hook to `~/.claude/settings.json` (user-level, NOT project-level):
+    ```json
+    {
+      "hooks": {
+        "SessionStart": [{
+          "matcher": "startup",
+          "hooks": [{ "type": "command", "command": "node ~/.claude/hooks/obs-daemon.mjs start", "timeout": 5 }]
+        }]
+      }
+    }
+    ```
+  - If **no**: No extra config needed. claude-mem works out of the box.
+- **If NOT found:** Add to the summary:
+  > **claude-mem not installed** (recommended). Persistent memory across sessions. Install: `claude plugin install claude-mem`
+
+**10c. Maestri**
+
+```bash
+$MAESTRI_CLI list 2>/dev/null || maestri list 2>/dev/null
+```
+
+- **If found:** Note "Maestri detected" in the summary. Remind: "Run `/einstein-workflow:setup-maestri` to create the workspace."
+- **If NOT found:** Add to the summary:
+  > **Maestri not detected.** Multi-terminal orchestration for the Tech Lead workflow. Download: https://www.themaestri.app
+  > You can still use the agents directly without Maestri.
+
+### Step 11: Summary
 
 Tell the user:
 
@@ -369,10 +424,16 @@ Tell the user:
 
 **Conflicts resolved:** (list any files that were backed up or skipped)
 
+**Tools detected:**
+- RTK: {installed / not installed — install from https://github.com/rtk-ai/rtk}
+- claude-mem: {installed / not installed — `claude plugin install claude-mem`}
+- Maestri: {detected / not detected — https://www.themaestri.app}
+
 **Next steps:**
-1. Run `/einstein-workflow:setup-maestri` to configure Maestri terminals (optional)
-2. Test: ask the tech-lead agent to analyze a feature
-3. Commit the generated files (add `.claude/settings.local.json` to `.gitignore`)
+1. {If Maestri detected:} Run `/einstein-workflow:setup-maestri` to create the workspace
+2. {If tools missing:} Install the recommended tools listed above
+3. Test: ask the tech-lead agent to analyze a feature
+4. Commit the generated files (add `.claude/settings.local.json` to `.gitignore`)
 
 **Re-running this wizard:**
 - Safe to re-run anytime. It detects existing files and asks before overwriting.

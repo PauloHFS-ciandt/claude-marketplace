@@ -98,50 +98,17 @@ Tell the user:
 
 > Setup complete! Your Maestri workspace is ready.
 >
+> **This terminal was only used for installation.** You can close it now.
+> From now on, talk directly to the **Tech Lead** terminal on the canvas.
+>
 > **How to use:**
 > - Talk to **Tech Lead** — it orchestrates all work and delegates to specialists
 > - Tech Lead uses `maestri ask "Backend" "..."` to delegate implementation
 > - **AppSec** review is mandatory before creating PRs
 >
-> **Try it:**
+> **Try it** (from the Tech Lead terminal):
 > ```
 > maestri ask "Tech Lead" "what can you help me with?"
 > ```
 
-## Optional: claude-mem Worker (CI&T proxy users)
-
-If the team uses CI&T's Flow LLM proxy and has claude-mem installed, the plugin includes a custom observation processor that bypasses the broken SDK.
-
-Ask the user: "Do you use CI&T's Flow proxy and claude-mem? (yes/no)"
-
-If yes:
-
-1. Check if `_FLOW_PROXY_API_KEY` is defined:
-   ```bash
-   grep '_FLOW_PROXY_API_KEY' ~/.zshrc
-   ```
-
-2. If defined, configure the obs-daemon as a SessionStart hook. Add to `~/.claude/settings.json` under `hooks.SessionStart`:
-   ```json
-   {
-     "matcher": "startup",
-     "hooks": [{
-       "type": "command",
-       "command": "node ~/.claude/hooks/obs-daemon.mjs start",
-       "timeout": 5
-     }]
-   }
-   ```
-
-3. Copy the daemon script from the installed plugin:
-   ```bash
-   PLUGIN_PATH=$(find ~/.claude/plugins -path "*/einstein-workflow/worker/obs-daemon.mjs" 2>/dev/null | head -1)
-   cp "$PLUGIN_PATH" ~/.claude/hooks/obs-daemon.mjs
-   ```
-
-4. Start it:
-   ```bash
-   node ~/.claude/hooks/obs-daemon.mjs start
-   ```
-
-If no, skip this section entirely.
+**Note:** RTK, claude-mem, and Maestri detection/configuration is handled automatically by `/einstein-workflow:setup-project` (Step 10). No manual setup needed here.

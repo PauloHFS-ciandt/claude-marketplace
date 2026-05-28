@@ -225,7 +225,19 @@ All specialists report back to Tech Lead after completing tasks.
 AppSec review is MANDATORY before any PR is created.
 ```
 
-## Step 8: Verify & Report
+## Step 8: Dismiss Installer Terminal
+
+The current terminal (where you ran the setup) is now an orphan — all work should go through the Tech Lead terminal instead. Tell the user:
+
+> **Setup complete!** You can now close this terminal — it was only used for installation.
+> From now on, talk directly to the **Tech Lead** terminal on the canvas, or use:
+> ```
+> maestri ask "Tech Lead" "what can you help me with?"
+> ```
+
+**Do NOT dismiss the current terminal via CLI** — let the user close it manually from the Maestri canvas (right-click → Dismiss) so they can review the setup output first.
+
+## Step 9: Verify & Report
 
 Run `maestri list` and confirm all terminals appear.
 
@@ -239,11 +251,9 @@ Then print the topology:
 │   ├── → Frontend
 │   ├── → Mobile
 │   └── → AppSec (security gate)
-├── Shell (standalone)
 └── Note: {ProjectName} overview
 
-Ready! Talk to "Tech Lead" to start working.
-Example: maestri ask "Tech Lead" "plan the next sprint"
+Ready! Close this installer terminal and talk to "Tech Lead" directly.
 ```
 
 ## Re-running the Skill
