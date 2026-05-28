@@ -6,6 +6,15 @@ Stack-agnostic: os agents definem **metodologia**, o projeto define **contexto**
 
 ## Quick Start
 
+Abra o Maestri, crie um terminal Claude Code no seu projeto, e cole isto:
+
+> Install and configure einstein-workflow by following the instructions here:
+> https://raw.githubusercontent.com/PauloHFS-ciandt/einstein-workflow/main/docs/install.md
+
+O agente instala o plugin, configura o projeto, e monta o workspace do Maestri automaticamente — terminais, conexoes, roles, tudo no canvas.
+
+### Setup manual (alternativa)
+
 ```bash
 # 1. Instalar o plugin
 claude plugin install PauloHFS-ciandt/einstein-workflow
@@ -13,24 +22,21 @@ claude plugin install PauloHFS-ciandt/einstein-workflow
 # 2. Abrir o projeto
 cd seu-projeto && claude
 
-# 3. Rodar o wizard
+# 3. Configurar projeto
 /einstein-workflow:setup-project
+
+# 4. Montar workspace Maestri
+/einstein-workflow:setup-maestri
 ```
 
-O wizard pergunta sobre o projeto e gera:
+O wizard gera:
 
 - `CLAUDE.md` — contexto do projeto (stack, paths, convencoes)
 - `.claude/agents/` — 16 agents copiados para o projeto
 - `.claude/rules/` — 3 rules copiadas para o projeto
 - `.claude/settings.json` — MCP servers, permissoes, env vars
 - `.claude/WORKFLOW.md` — topologia de agents e fluxo
-
-Depois, configurar o Maestri:
-```
-/einstein-workflow:setup-maestri
-```
-
-Gera `.maestri/` com terminais: Tech Lead, Backend, Frontend, Mobile, AppSec, Shell.
+- Terminais Maestri: Tech Lead, Backend, Frontend, Mobile, AppSec
 
 Seguro re-rodar apos atualizacao do plugin.
 
