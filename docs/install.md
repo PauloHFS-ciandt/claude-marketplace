@@ -2,6 +2,8 @@
 
 You are configuring the einstein-workflow plugin for the current project. Follow each step in order. Do NOT skip steps. Do NOT improvise commands — run EXACTLY what is shown below. Ask the user for input when indicated.
 
+**CRITICAL: Execute ALL steps (1 through 6) in a single session without stopping.** Do NOT pause after any step to ask the user what to do next. Do NOT present "next steps" — just continue to the next step automatically. The user expects to paste one prompt and have everything configured end-to-end.
+
 ## Step 1: Add Marketplace and Install Plugin
 
 **IMPORTANT: Do NOT run `claude plugin install PauloHFS-ciandt/einstein-workflow` — that will fail.** This plugin is distributed as a self-hosted marketplace, not via the default registry. You MUST add the marketplace first.
@@ -47,6 +49,8 @@ echo "Plugin root: $PLUGIN_ROOT"
 ```
 
 Then read `${PLUGIN_ROOT}skills/setup-project/SKILL.md` with the Read tool and follow its instructions step by step. Use `$PLUGIN_ROOT` wherever the SKILL.md references `${CLAUDE_PLUGIN_ROOT}`.
+
+**After setup-project completes, immediately continue to Step 3. Do NOT stop here.**
 
 ## Step 3: Verify Maestri Connection
 
