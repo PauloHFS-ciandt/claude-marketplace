@@ -1,30 +1,37 @@
 # einstein-workflow — Automated Setup Guide
 
-You are configuring the einstein-workflow plugin for the current project. Follow each step in order. Do NOT skip steps. Ask the user for input when indicated.
+You are configuring the einstein-workflow plugin for the current project. Follow each step in order. Do NOT skip steps. Do NOT improvise commands — run EXACTLY what is shown below. Ask the user for input when indicated.
 
 ## Step 1: Add Marketplace and Install Plugin
 
-First, register the einstein-workflow GitHub repository as a plugin marketplace, then install the plugin:
+**IMPORTANT: Do NOT run `claude plugin install PauloHFS-ciandt/einstein-workflow` — that will fail.** This plugin is distributed as a self-hosted marketplace, not via the default registry. You MUST add the marketplace first.
+
+Run these two commands in order:
 
 ```bash
 claude plugin marketplace add PauloHFS-ciandt/einstein-workflow
-claude plugin install einstein-workflow
+```
+
+Wait for it to complete, then:
+
+```bash
+claude plugin install einstein-workflow@einstein-workflow
 ```
 
 If the marketplace is already added, the first command is a no-op. Same for the plugin if already installed.
 
 **Updating an existing installation:**
 
-If the plugin is already installed and needs updating, run:
-
 ```bash
 claude plugin marketplace update einstein-workflow
-claude plugin update einstein-workflow
+claude plugin update einstein-workflow@einstein-workflow
 ```
 
 Then re-run `/einstein-workflow:setup-project` in each project to update the agents and rules copied to `.claude/` (the wizard detects conflicts and backs up existing files before overwriting).
 
-Move on.
+**After installing or updating:** skills may not be available until the Claude Code session is restarted. If `/einstein-workflow:setup-project` returns "Unknown skill", tell the user to restart Claude Code and re-run this setup.
+
+Move on to Step 2.
 
 ## Step 2: Run Project Setup
 
@@ -51,13 +58,13 @@ Let the wizard run to completion. It generates:
 
 ## Step 3: Verify Maestri Connection
 
-Check that this terminal is on the Maestri canvas:
+Check that this terminal is on the Maestri canvas. The CLI may be available as `$MAESTRI_CLI` (env var set by Maestri) or `maestri` (in PATH). Try both:
 
 ```bash
-maestri list
+$MAESTRI_CLI list 2>/dev/null || maestri list 2>/dev/null
 ```
 
-If this fails, tell the user:
+If BOTH fail, tell the user:
 > Open the Maestri app and make sure this terminal is on a Maestri canvas. Then say "continue" and I'll proceed.
 
 Wait for the user to confirm before continuing.
@@ -76,7 +83,7 @@ Let the wizard run to completion.
 
 ## Step 5: Verify
 
-Run `maestri list` and confirm the terminals appear. You should see entries like:
+Run `$MAESTRI_CLI list` (or `maestri list`) and confirm the terminals appear. You should see entries like:
 - Tech Lead
 - Backend
 - Frontend

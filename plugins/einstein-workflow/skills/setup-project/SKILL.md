@@ -274,7 +274,7 @@ AppSec review is **mandatory** before every PR. The Tech Lead enforces this.
 
 | Tool | Purpose | Install |
 |---|---|---|
-| **Maestri** | Multi-terminal orchestration (required) | Download from maestri.dev |
+| **Maestri** | Multi-terminal orchestration (required) | Download from [themaestri.app](https://www.themaestri.app) |
 | **RTK** | Token compression for Bash (60-90% savings) | `curl -fsSL https://raw.githubusercontent.com/cortesi/rtk/main/install.sh \| bash` |
 | **claude-mem** | Persistent memory across sessions | `claude plugin install claude-mem` + `npx claude-mem start` |
 | **Context7** | Library documentation lookup | Included via context7 plugin |
@@ -340,35 +340,13 @@ Rule files to install (3):
 - context7-documentation.mdc
 - no-unsolicited-markdown.mdc
 
-### Step 8: Install Hook Guard
+### Step 8: Hooks
 
-Check if the project's `.claude/settings.json` already has hooks defined.
+**Do NOT add hooks to the project's `.claude/settings.json`.**
 
-**If NO hooks exist:** Add the plugin's recommended hooks:
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/block-env-edits.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
+All hooks (track-edit, doc-guard-stop, block-env-edits, lint-on-edit) run automatically from the plugin's `plugin.json`. The `${CLAUDE_PLUGIN_ROOT}` variable only works inside plugin-defined hooks — it does NOT resolve in project-level settings.json and will cause errors.
 
-**If hooks ALREADY exist:** Do NOT overwrite. Instead, inform the user:
-- "Your project already has hooks configured in `.claude/settings.json`."
-- "The einstein-workflow plugin provides these hooks via `plugin.json` and they will run automatically in addition to your project hooks."
-- "If you experience duplicate behavior (e.g., double lint-on-edit), you may want to remove the project-level hook."
-
-The plugin hooks (notification, track-edit, doc-guard-stop, block-env-edits, lint-on-edit) always run from the plugin's `plugin.json` — they don't need to be in the project settings. The only reason to add them to project settings is if the plugin is not installed (standalone mode).
+If the project already has custom hooks in `.claude/settings.json`, leave them as-is. Plugin hooks and project hooks are additive (both run). If the user reports duplicate behavior (e.g., double lint-on-edit), they should remove the project-level duplicate.
 
 ### Step 9: Explore and Enrich
 

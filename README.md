@@ -20,7 +20,7 @@ O agente registra o marketplace, instala o plugin, configura o projeto, e monta 
 claude plugin marketplace add PauloHFS-ciandt/einstein-workflow
 
 # 2. Instalar o plugin
-claude plugin install einstein-workflow
+claude plugin install einstein-workflow@einstein-workflow
 
 # 3. Abrir o projeto
 cd seu-projeto && claude
@@ -50,7 +50,7 @@ Seguro re-rodar apos atualizacao do plugin.
 claude plugin marketplace update einstein-workflow
 
 # 2. Atualizar o plugin
-claude plugin update einstein-workflow
+claude plugin update einstein-workflow@einstein-workflow
 
 # 3. Reiniciar o Claude Code para aplicar
 ```
