@@ -178,11 +178,10 @@ Read .claude/MIGRATION.md for the specific migration checklist.
 
 ### Step 3: Generate .claude/settings.json
 
-Create `.claude/settings.json` with:
+Create `.claude/settings.json` with **NO hooks** (hooks come from the plugin automatically):
 
 ```json
 {
-  "hooks": {},
   "permissions": {
     "allow": [
       "Bash(git add *)",
@@ -293,60 +292,71 @@ After generating the files, **explore the actual codebase** to fill in:
 
 ### Step 6: Install Agents
 
-Copy all 14 agent files from the plugin into the project's `.claude/agents/` directory.
+Copy EXACTLY these 16 agent files from the plugin into `.claude/agents/`. **Do NOT use glob (`*.md`) — copy only the files listed below.** The plugin cache directory may contain extra files that should not be copied.
 
 **The plugin root is available via `${CLAUDE_PLUGIN_ROOT}`.** Use it to find the agent source files.
 
+**Files to copy (16 — no more, no less):**
+
+```bash
+AGENTS=(
+  tech-lead.md
+  backend-engineer.md
+  frontend-engineer.md
+  mobile-engineer.md
+  security-reviewer.md
+  lexicon.md
+  api-contract-designer.md
+  data-model-designer.md
+  edge-case-hunter.md
+  integration-impact-analyst.md
+  po-analyst.md
+  ux-consistency-reviewer.md
+  doc-shepherd.md
+  pattern-extractor.md
+  plan-sync.md
+  readme-writer.md
+)
+
+mkdir -p .claude/agents
+for f in "${AGENTS[@]}"; do
+  cp "${CLAUDE_PLUGIN_ROOT}/agents/$f" .claude/agents/
+done
+echo "Copied ${#AGENTS[@]} agent files"
 ```
-Source: ${CLAUDE_PLUGIN_ROOT}/agents/*.md
-Target: .claude/agents/
-```
 
-**Conflict detection:** Before copying each file:
-1. Check if `.claude/agents/{name}.md` already exists
-2. If it does, compare content (first 3 lines are enough — check the YAML `name:` field)
-3. If the existing file has the SAME name but DIFFERENT content, ask the user:
-   - "You already have `.claude/agents/{name}.md`. Replace with the einstein-workflow version? (Your version will be backed up to `.claude/agents/{name}.md.bak`)"
-4. If the existing file is identical to the plugin version, skip silently
-
-**Always create `.claude/agents/` directory if it doesn't exist.**
-
-Agent files to install (16):
-- tech-lead.md, backend-engineer.md, frontend-engineer.md, mobile-engineer.md
-- security-reviewer.md (CI&T AppSec — mandatory security gate)
-- lexicon.md (Prompt Engineer — optimizes prompts for agents, skills, CLAUDE.md)
-- api-contract-designer.md, data-model-designer.md, edge-case-hunter.md
-- integration-impact-analyst.md, po-analyst.md, ux-consistency-reviewer.md
-- doc-shepherd.md, pattern-extractor.md, plan-sync.md, readme-writer.md
+**Conflict detection:** Before copying each file, check if it already exists. If it does and has different content, ask the user before overwriting (backup to `.bak`). If identical, skip silently.
 
 ### Step 7: Install Rules
 
-Copy all 3 rule files from the plugin into the project's `.claude/rules/` directory.
+Copy EXACTLY these 3 rule files from the plugin into `.claude/rules/`. **Do NOT use glob (`*.mdc`).**
 
+```bash
+RULES=(
+  commits.mdc
+  context7-documentation.mdc
+  no-unsolicited-markdown.mdc
+)
+
+mkdir -p .claude/rules
+for f in "${RULES[@]}"; do
+  cp "${CLAUDE_PLUGIN_ROOT}/rules/$f" .claude/rules/
+done
+echo "Copied ${#RULES[@]} rule files"
 ```
-Source: ${CLAUDE_PLUGIN_ROOT}/rules/*.mdc
-Target: .claude/rules/
-```
 
-**Same conflict detection as agents:**
-1. Check if `.claude/rules/{name}.mdc` already exists
-2. If different content, ask before overwriting (backup to `.bak`)
-3. If identical, skip silently
+Same conflict detection as agents.
 
-**Always create `.claude/rules/` directory if it doesn't exist.**
+### Step 8: Hooks — DO NOT ADD
 
-Rule files to install (3):
-- commits.mdc
-- context7-documentation.mdc
-- no-unsolicited-markdown.mdc
+**CRITICAL: Do NOT add ANY hooks to the project's `.claude/settings.json`. Not with `${CLAUDE_PLUGIN_ROOT}`, not with absolute paths, not with relative paths. ZERO hooks in the project settings.**
 
-### Step 8: Hooks
+All hooks (track-edit, doc-guard-stop, block-env-edits, lint-on-edit) run automatically from the plugin's `plugin.json`. Adding them to the project settings will either:
+- Cause `${CLAUDE_PLUGIN_ROOT}` errors (variable only resolves inside plugin hooks)
+- Create absolute paths to the plugin cache that break on updates
+- Cause duplicate hook execution
 
-**Do NOT add hooks to the project's `.claude/settings.json`.**
-
-All hooks (track-edit, doc-guard-stop, block-env-edits, lint-on-edit) run automatically from the plugin's `plugin.json`. The `${CLAUDE_PLUGIN_ROOT}` variable only works inside plugin-defined hooks — it does NOT resolve in project-level settings.json and will cause errors.
-
-If the project already has custom hooks in `.claude/settings.json`, leave them as-is. Plugin hooks and project hooks are additive (both run). If the user reports duplicate behavior (e.g., double lint-on-edit), they should remove the project-level duplicate.
+The `.claude/settings.json` should contain ONLY `permissions`, `env`, and `mcpServers`. No `hooks` key at all.
 
 ### Step 9: Explore and Enrich
 
@@ -358,7 +368,7 @@ After generating the files, **explore the actual codebase** to fill in:
 
 ### Step 10: Detect Optional Tools
 
-Check for recommended tools and configure what's already installed. Report what's missing.
+**This step is MANDATORY — do NOT skip it.** Run each detection command below and include the results in the summary.
 
 **10a. RTK (Token Compression)**
 
