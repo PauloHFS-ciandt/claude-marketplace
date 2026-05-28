@@ -149,18 +149,22 @@ Repeat for each terminal. Use descriptive temp file names: `maestri-role-backend
 
 ## Step 4: Recruit Terminals
 
-Create each terminal on the canvas. Run these **sequentially** with a 2-second pause between each:
+Create each terminal on the canvas. Run these **sequentially** with a 2-second pause between each.
+
+**Model assignment:** Tech Lead runs on **Opus** (orchestration needs the strongest model). All specialists run on **Sonnet** (implementation tasks, cost-efficient).
 
 ```bash
-maestri recruit "Tech Lead" --preset "Claude Code" --role "{ProjectName} - Tech Lead"
+# Tech Lead = Opus
+maestri recruit "Tech Lead" --preset "Claude Code" --role "{ProjectName} - Tech Lead" --command "claude --model anthropic.claude-4-6-opus[1m]"
 sleep 2
-maestri recruit "Backend" --preset "Claude Code" --role "{ProjectName} - Backend Engineer"
+# Specialists = Sonnet
+maestri recruit "Backend" --preset "Claude Code" --role "{ProjectName} - Backend Engineer" --command "claude --model anthropic.claude-4.6-sonnet[1m]"
 sleep 2
-maestri recruit "Frontend" --preset "Claude Code" --role "{ProjectName} - Frontend Engineer"
+maestri recruit "Frontend" --preset "Claude Code" --role "{ProjectName} - Frontend Engineer" --command "claude --model anthropic.claude-4.6-sonnet[1m]"
 sleep 2
-maestri recruit "Mobile" --preset "Claude Code" --role "{ProjectName} - Mobile Engineer"
+maestri recruit "Mobile" --preset "Claude Code" --role "{ProjectName} - Mobile Engineer" --command "claude --model anthropic.claude-4.6-sonnet[1m]"
 sleep 2
-maestri recruit "AppSec" --preset "Claude Code" --role "{ProjectName} - AppSec Engineer"
+maestri recruit "AppSec" --preset "Claude Code" --role "{ProjectName} - AppSec Engineer" --command "claude --model anthropic.claude-4.6-sonnet[1m]"
 ```
 
 If Shell was selected:
@@ -188,7 +192,29 @@ Only connect terminals that were actually recruited in Step 4. Shell is NOT conn
 
 **If `maestri connect` fails:** wait 3 seconds and retry once — terminals may still be initializing.
 
-## Step 6: Create Shared Note
+## Step 6: Create Frontend Portal
+
+**Only if Frontend Engineer was recruited in Step 4.**
+
+Create a browser portal on the canvas and connect it to the Frontend terminal. This gives the Frontend Engineer a live preview of the UI.
+
+1. **Determine the dev server URL** — read the CLAUDE.md Key Commands section for the frontend sub-project. Look for the `dev` script port. Common defaults:
+   - Vite: `http://localhost:5173`
+   - Next.js: `http://localhost:3000`
+   - webpack-dev-server: `http://localhost:8080`
+   
+   If you can't determine the port, use `http://localhost:5173` as default.
+
+2. **Create and connect the portal:**
+   ```bash
+   maestri portal create "{dev_server_url}" "Frontend Preview"
+   sleep 2
+   maestri connect "Frontend" "Frontend Preview"
+   ```
+
+The portal appears on the canvas as a browser window. The Frontend Engineer can use `maestri portal snapshot`, `maestri portal screenshot`, and other portal commands to inspect the UI while implementing.
+
+## Step 7: Create Shared Note
 
 Create a project overview sticky note. Use `$'...'` syntax for real newlines:
 
@@ -203,20 +229,23 @@ Then connect it to the Tech Lead terminal too:
 maestri connect "Tech Lead" "{kebab-case-project-name}"
 ```
 
-## Step 7: Update WORKFLOW.md
+## Step 8: Update WORKFLOW.md
 
 Append or replace the `## Maestri Workspace` section in `.claude/WORKFLOW.md`:
 
 ```markdown
 ## Maestri Workspace
 
-| Terminal | Role | Scope |
-|----------|------|-------|
-| Tech Lead | Orchestration | Full project |
-| Backend | Implementation | {backend path} |
-| Frontend | Implementation | {frontend path} |
-| Mobile | Implementation | {mobile path} |
-| AppSec | Security gate | Full project |
+| Terminal | Model | Role | Scope |
+|----------|-------|------|-------|
+| Tech Lead | Opus | Orchestration | Full project |
+| Backend | Sonnet | Implementation | {backend path} |
+| Frontend | Sonnet | Implementation | {frontend path} |
+| Mobile | Sonnet | Implementation | {mobile path} |
+| AppSec | Sonnet | Security gate | Full project |
+{if Frontend was recruited}
+| Frontend Preview | — | Browser portal | {dev_server_url} |
+{endif}
 
 ### Delegation Protocol
 
@@ -225,7 +254,7 @@ All specialists report back to Tech Lead after completing tasks.
 AppSec review is MANDATORY before any PR is created.
 ```
 
-## Step 8: Dismiss Installer Terminal
+## Step 9: Dismiss Installer Terminal
 
 The current terminal (where you ran the setup) is now an orphan — all work should go through the Tech Lead terminal instead. Tell the user:
 
@@ -237,24 +266,26 @@ The current terminal (where you ran the setup) is now an orphan — all work sho
 
 **Do NOT dismiss the current terminal via CLI** — let the user close it manually from the Maestri canvas (right-click → Dismiss) so they can review the setup output first.
 
-## Step 9: Verify & Report
+## Step 10: Verify & Report
 
-Run `maestri list` and confirm all terminals appear.
+Run `maestri list` and confirm all terminals and portals appear.
 
 Then print the topology:
 
 ```
 {ProjectName} Maestri Workspace
 
-├── Tech Lead ←──┐
-│   ├── → Backend
-│   ├── → Frontend
-│   ├── → Mobile
-│   └── → AppSec (security gate)
+├── Tech Lead (Opus) ←──┐
+│   ├── → Backend (Sonnet)
+│   ├── → Frontend (Sonnet) ←→ Portal: Frontend Preview
+│   ├── → Mobile (Sonnet)
+│   └── → AppSec (Sonnet)
 └── Note: {ProjectName} overview
 
 Ready! Close this installer terminal and talk to "Tech Lead" directly.
 ```
+
+Only show terminals/portals that were actually created. Omit Mobile if not recruited, omit Portal if Frontend was not recruited.
 
 ## Re-running the Skill
 
