@@ -27,41 +27,33 @@ claude plugin marketplace update einstein-workflow
 claude plugin update einstein-workflow@einstein-workflow
 ```
 
-Then re-run `/einstein-workflow:setup-project` in each project to update the agents and rules copied to `.claude/` (the wizard detects conflicts and backs up existing files before overwriting).
-
-**After installing or updating:** skills may not be available until the Claude Code session is restarted. If `/einstein-workflow:setup-project` returns "Unknown skill", tell the user:
-
-> The plugin was installed but skills aren't loaded yet. Please restart Claude Code (`exit` then `claude`) and paste this prompt again:
-> 
-> Install and configure einstein-workflow by following the instructions here:
-> https://raw.githubusercontent.com/PauloHFS-ciandt/einstein-workflow/main/docs/install.md
-
-Then STOP — do not continue. The fresh session will pick up from Step 2.
-
-Move on to Step 2.
+Then re-run Step 2 in each project to update the agents and rules copied to `.claude/`.
 
 ## Step 2: Run Project Setup
 
 This generates the project's CLAUDE.md, copies agents, rules, and configures settings.
 
-Run the skill:
+**First, try running the skill directly:**
 
 ```
 /einstein-workflow:setup-project
 ```
 
-This is an interactive wizard — it will ask the user about:
-- Project name and description
-- Sub-projects (backend, frontend, mobile paths and stacks)
-- Azure DevOps organization, project, and team (optional)
-- Whether to enable the security gate
+**If the skill returns "Unknown skill"** (this happens when the plugin was just installed in the same session), read and execute the skill instructions directly from the plugin cache:
 
-Let the wizard run to completion. It generates:
-- `CLAUDE.md` at the project root
-- `.claude/agents/` with 16 agents
-- `.claude/rules/` with 3 rules
-- `.claude/settings.json` with MCP servers and permissions
-- `.claude/WORKFLOW.md` with team topology
+```bash
+SKILL_FILE=$(find ~/.claude/plugins -path "*/einstein-workflow/skills/setup-project/SKILL.md" 2>/dev/null | head -1)
+echo "Skill file: $SKILL_FILE"
+```
+
+Read that file with the Read tool and follow its instructions step by step. The SKILL.md contains the full interactive wizard — execute each step as written. The plugin root for agent/rule file copies is the parent of the `skills/` directory:
+
+```bash
+PLUGIN_ROOT=$(dirname "$(dirname "$SKILL_FILE")")
+echo "Plugin root: $PLUGIN_ROOT"
+```
+
+Use `$PLUGIN_ROOT` wherever the SKILL.md references `${CLAUDE_PLUGIN_ROOT}`.
 
 ## Step 3: Verify Maestri Connection
 
@@ -78,24 +70,29 @@ Wait for the user to confirm before continuing.
 
 ## Step 4: Set Up Maestri Workspace
 
-Run the skill to create specialist terminals on the canvas:
+**First, try running the skill directly:**
 
 ```
 /einstein-workflow:setup-maestri
 ```
 
-This creates roles, recruits terminals (Tech Lead, Backend, Frontend, Mobile, AppSec), wires connections between them, and adds a shared project note — all directly on the Maestri canvas.
+**If the skill returns "Unknown skill"**, read and execute from the plugin cache (same approach as Step 2):
 
-Let the wizard run to completion.
+```bash
+SKILL_FILE=$(find ~/.claude/plugins -path "*/einstein-workflow/skills/setup-maestri/SKILL.md" 2>/dev/null | head -1)
+echo "Skill file: $SKILL_FILE"
+```
+
+Read that file with the Read tool and follow its instructions step by step.
 
 ## Step 5: Verify
 
-Run `$MAESTRI_CLI list` (or `maestri list`) and confirm the terminals appear. You should see entries like:
+Run `$MAESTRI_CLI list` (or `maestri list`) and confirm the terminals and portals appear. You should see entries like:
 - Tech Lead
 - Backend
 - Frontend
-- Mobile
 - AppSec
+- Frontend Preview (portal, if Frontend was created)
 
 If any are missing, report the issue to the user.
 
@@ -118,4 +115,4 @@ Tell the user:
 > maestri ask "Tech Lead" "what can you help me with?"
 > ```
 
-**Note:** RTK, claude-mem, and Maestri detection/configuration is handled automatically by `/einstein-workflow:setup-project` (Step 10). No manual setup needed here.
+**Note:** RTK, claude-mem, and Maestri detection/configuration is handled automatically by the setup-project wizard (Step 10 of the SKILL.md). No manual setup needed here.
