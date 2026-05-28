@@ -358,15 +358,7 @@ All hooks (track-edit, doc-guard-stop, block-env-edits, lint-on-edit) run automa
 
 The `.claude/settings.json` should contain ONLY `permissions`, `env`, and `mcpServers`. No `hooks` key at all.
 
-### Step 9: Explore and Enrich
-
-After generating the files, **explore the actual codebase** to fill in:
-- Project Structure sections in CLAUDE.md (read actual directories)
-- Key Commands (read package.json scripts)
-- Path aliases (read tsconfig.json or babel.config.js)
-- Environment variables (read .env.tpl or .env.example)
-
-### Step 10: Detect Optional Tools
+### Step 9: Detect Optional Tools
 
 **This step is MANDATORY — do NOT skip it.** Run each detection command below and include the results in the summary.
 
@@ -416,12 +408,12 @@ claude plugin list 2>&1 | grep claude-mem
 $MAESTRI_CLI list 2>/dev/null || maestri list 2>/dev/null
 ```
 
-- **If found:** Note "Maestri detected" in the summary. Remind: "Run `/einstein-workflow:setup-maestri` to create the workspace."
+- **If found:** Note "Maestri detected" in the summary. Do NOT suggest running setup-maestri here — the install guide handles that.
 - **If NOT found:** Add to the summary:
   > **Maestri not detected.** Multi-terminal orchestration for the Tech Lead workflow. Download: https://www.themaestri.app
   > You can still use the agents directly without Maestri.
 
-### Step 11: Summary
+### Step 10: Summary
 
 Tell the user:
 
