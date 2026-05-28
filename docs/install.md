@@ -50,7 +50,7 @@ echo "Plugin root: $PLUGIN_ROOT"
 
 Then read `${PLUGIN_ROOT}skills/setup-project/SKILL.md` with the Read tool and follow its instructions step by step. Use `$PLUGIN_ROOT` wherever the SKILL.md references `${CLAUDE_PLUGIN_ROOT}`.
 
-**After setup-project completes, immediately continue to Step 3. Do NOT stop here.**
+**After setup-project completes, immediately continue to Step 3. Do NOT stop here. Do NOT present "next steps" to the user. Do NOT suggest running /setup-maestri as a next step — YOU will run it in Step 4.**
 
 ## Step 3: Verify Maestri Connection
 

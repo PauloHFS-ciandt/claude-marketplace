@@ -439,12 +439,13 @@ Tell the user:
 - claude-mem: {installed / not installed — `claude plugin install claude-mem`}
 - Maestri: {detected / not detected — https://www.themaestri.app}
 
-**Next steps:**
+**What's next:** If you were called from the install.md guide, return control to it — do NOT suggest next steps yourself. The install guide handles the remaining steps (Maestri setup, verification, final report).
+
+If running standalone (user invoked `/einstein-workflow:setup-project` directly):
 1. {If Maestri detected:} Run `/einstein-workflow:setup-maestri` to create the workspace
 2. {If tools missing:} Install the recommended tools listed above
-3. Test: ask the tech-lead agent to analyze a feature
-4. Commit the generated files (add `.claude/settings.local.json` to `.gitignore`)
+3. Commit the generated files (add `.claude/settings.local.json` to `.gitignore`)
 
 **Re-running this wizard:**
 - Safe to re-run anytime. It detects existing files and asks before overwriting.
-- Use it after plugin updates to get new agent versions: "Just re-run `/einstein-workflow:setup-project`"
+- Use it after plugin updates to get new agent versions.
