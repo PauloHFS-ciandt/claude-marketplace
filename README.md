@@ -6,7 +6,11 @@ Stack-agnostic: os agents definem **metodologia**, o projeto define **contexto**
 
 ## Quick Start
 
-Abra o Maestri, crie um terminal Claude Code no seu projeto, e cole isto:
+**Requisito:** o terminal Claude Code precisa estar dentro de um canvas do [Maestri](https://www.themaestri.app). Se ainda nao instalou, veja a secao [Pre-requisitos](#pre-requisitos) abaixo.
+
+1. Abra o Maestri
+2. Crie um terminal Claude Code no canvas, apontando para o diretorio do seu projeto
+3. Cole isto no terminal:
 
 > Install and configure einstein-workflow by following the instructions here:
 > https://raw.githubusercontent.com/PauloHFS-ciandt/einstein-workflow/main/docs/install.md
@@ -61,74 +65,32 @@ Agents e rules copiados para o `.claude/` do projeto **nao atualizam automaticam
 
 ## Pre-requisitos
 
-| Ferramenta | Obrigatorio | Para que serve |
-|---|---|---|
-| **Claude Code CLI** | Sim | Runtime dos agents |
-| **Node.js >= 18** | Sim | Hooks e worker |
-| **Maestri** | Sim | Tech Lead delega via `maestri ask` |
-| **Azure CLI** (`az login`) | Se usar Azure DevOps | Auth do MCP de Azure DevOps |
-| **RTK** | Recomendado | Compressao de tokens (60-90% economia) |
-| **claude-mem** | Recomendado | Memoria persistente entre sessoes |
+| Ferramenta | Obrigatorio | Para que serve | Instalar |
+|---|---|---|---|
+| **Claude Code CLI** | Sim | Runtime dos agents | Ja esta rodando se voce ve este terminal |
+| **Node.js >= 18** | Sim | Hooks e worker | https://nodejs.org |
+| **Maestri** | Sim | Orquestracao multi-terminal | https://www.themaestri.app |
+| **Azure CLI** (`az login`) | Se usar Azure DevOps | Auth do MCP de Azure DevOps | https://learn.microsoft.com/cli/azure/install-azure-cli |
+| **RTK** | Recomendado | Compressao de tokens (60-90% economia) | https://github.com/rtk-ai/rtk |
+| **claude-mem** | Recomendado | Memoria persistente entre sessoes | `claude plugin install claude-mem` |
 
-### Instalar RTK
+> **O terminal do Quick Start DEVE estar dentro do Maestri.** O installer usa o CLI do Maestri para criar terminais, roles e portais no canvas. Sem Maestri, o setup-maestri falha.
 
-Verifique o guia de instalação no repositorio oficial: [rtk-ai/rtk](https://github.com/rtk-ai/rtk)
+### claude-mem + Worker customizado (CI&T)
 
-### Instalar claude-mem + Worker customizado
+O wizard `/setup-project` detecta o claude-mem automaticamente e configura tudo — incluindo o worker customizado para o proxy da CI&T. Basta ter o claude-mem instalado e a variavel `_FLOW_PROXY_API_KEY` no `~/.zshrc` antes de rodar o Quick Start.
 
-O worker padrao do claude-mem nao funciona com o proxy da CI&T. O plugin inclui um worker customizado (`worker/obs-daemon.mjs`) que chama o proxy direto via curl.
-
-**1. Instalar o plugin claude-mem:**
 ```bash
+# 1. Instalar
 claude plugin install claude-mem
-```
 
-**2. Configurar a API key** (adicionar ao `~/.zshrc`):
-```bash
+# 2. Configurar API key (adicionar ao ~/.zshrc)
 readonly _FLOW_PROXY_API_KEY="sua-chave-do-flow-proxy"
+
+# 3. Rodar o Quick Start — o wizard faz o resto
 ```
-
-**3. Iniciar o worker customizado:**
-```bash
-# Encontrar o path do plugin instalado
-PLUGIN_PATH=$(find ~/.claude/plugins -path "*/einstein-workflow/worker/obs-daemon.mjs" 2>/dev/null | head -1)
-
-# Iniciar como daemon (auto-termina apos 30min idle)
-node "$PLUGIN_PATH" start
-
-# Outros comandos
-node "$PLUGIN_PATH" status   # verificar se ta rodando
-node "$PLUGIN_PATH" run      # rodar em foreground (debug)
-node "$PLUGIN_PATH" drain    # processar todas as observacoes pendentes
-node "$PLUGIN_PATH" stop     # parar
-```
-
-**4. Auto-start (opcional)** — adicionar ao `~/.claude/settings.json`:
-```json
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup",
-        "hooks": [{
-          "type": "command",
-          "command": "node /caminho/do/plugin/worker/obs-daemon.mjs start",
-          "timeout": 5
-        }]
-      }
-    ]
-  }
-}
-```
-
-**5. Terminal Maestri** — criar um terminal "Shell" no workspace que roda `node .../obs-daemon.mjs run` para manter o worker ativo com logs visiveis.
 
 **Web viewer:** `http://localhost:37740`
-
-Desabilitar memoria nativa do Claude Code em `~/.claude/settings.json`:
-```json
-{ "env": { "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1" } }
-```
 
 ---
 
