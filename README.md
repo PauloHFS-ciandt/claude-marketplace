@@ -26,13 +26,16 @@ claude plugin marketplace add PauloHFS-ciandt/claude-marketplace
 # 2. Instalar o plugin
 claude plugin install PauloHFS-ciandt@einstein-workflow
 
-# 3. Abrir o projeto
+# 3. (Opcional) Instalar worker para obs-daemon
+claude plugin install PauloHFS-ciandt@claude-mem-ciandt-worker
+
+# 4. Abrir o projeto
 cd seu-projeto && claude
 
-# 4. Configurar projeto
+# 5. Configurar projeto
 /einstein-workflow:setup-project
 
-# 5. Montar workspace Maestri
+# 6. Montar workspace Maestri
 /einstein-workflow:setup-maestri
 ```
 
@@ -56,7 +59,10 @@ claude plugin marketplace update PauloHFS-ciandt/claude-marketplace
 # 2. Atualizar o plugin
 claude plugin update PauloHFS-ciandt@einstein-workflow
 
-# 3. Reiniciar o Claude Code para aplicar
+# 3. (Se instalou) Atualizar worker
+claude plugin update PauloHFS-ciandt@claude-mem-ciandt-worker
+
+# 4. Reiniciar o Claude Code para aplicar
 ```
 
 Agents e rules copiados para o `.claude/` do projeto **nao atualizam automaticamente** — re-rode `/einstein-workflow:setup-project` para pegar as versoes novas (o wizard detecta conflitos e faz backup `.bak` antes de sobrescrever).
@@ -73,6 +79,7 @@ Agents e rules copiados para o `.claude/` do projeto **nao atualizam automaticam
 | **Azure CLI** (`az login`) | Se usar Azure DevOps | Auth do MCP de Azure DevOps | https://learn.microsoft.com/cli/azure/install-azure-cli |
 | **RTK** | Recomendado | Compressao de tokens (60-90% economia) | https://github.com/rtk-ai/rtk |
 | **claude-mem** | Recomendado | Memoria persistente entre sessoes | `claude plugin install claude-mem` |
+| **claude-mem-ciandt-worker** | Opcional | Worker para obs-daemon (requer claude-mem) | `claude plugin install PauloHFS-ciandt@claude-mem-ciandt-worker` |
 
 > **O terminal do Quick Start DEVE estar dentro do Maestri.** O installer usa o CLI do Maestri para criar terminais, roles e portais no canvas. Sem Maestri, o setup-maestri falha.
 
@@ -84,10 +91,13 @@ O wizard `/setup-project` detecta o claude-mem automaticamente e configura tudo 
 # 1. Instalar
 claude plugin install claude-mem
 
-# 2. Configurar API key (adicionar ao ~/.zshrc)
+# 2. (Opcional) Instalar worker para obs-daemon
+claude plugin install PauloHFS-ciandt@claude-mem-ciandt-worker
+
+# 3. Configurar API key (adicionar ao ~/.zshrc)
 readonly _FLOW_PROXY_API_KEY="sua-chave-do-flow-proxy"
 
-# 3. Rodar o Quick Start — o wizard faz o resto
+# 4. Rodar o Quick Start — o wizard faz o resto
 ```
 
 **Web viewer:** `http://localhost:37740`
@@ -210,11 +220,13 @@ MCP oficial da Microsoft (`@azure-devops/mcp`) — embutido no plugin, zero inst
 | `/einstein-workflow:frontend-security` | Checklist frontend security CI&T |
 | `/einstein-workflow:architecture-security` | Checklist architecture security CI&T |
 
-### 1 Worker
+### 1 Worker (Plugin separado)
 
-| Worker | O que faz |
-|---|---|
-| obs-daemon.mjs | Processa observacoes do claude-mem via proxy CI&T (substitui SDK quebrado) |
+| Worker | O que faz | Instalar |
+|---|---|---|
+| obs-daemon.mjs | Processa observacoes do claude-mem via proxy CI&T (substitui SDK quebrado) | `claude plugin install PauloHFS-ciandt@claude-mem-ciandt-worker` |
+
+> **Nota:** O worker `obs-daemon` foi movido para um plugin separado (`claude-mem-ciandt-worker`) para facilitar atualizacoes independentes. Instale apenas se usar claude-mem com proxy CI&T.
 
 ---
 
