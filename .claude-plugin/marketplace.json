@@ -13,6 +13,13 @@
       "source": "./plugins/einstein-workflow",
       "category": "workflow",
       "homepage": "https://github.com/PauloHFS-ciandt/einstein-workflow"
+    },
+    {
+      "name": "claude-mem-ciandt-worker",
+      "description": "Background worker that processes claude-mem observations via CI&T's Flow LLM proxy. Install this when using claude-mem inside CI&T's corporate network — replaces the broken Agent SDK with a direct curl-based daemon.",
+      "source": "./plugins/claude-mem-ciandt-worker",
+      "category": "infrastructure",
+      "homepage": "https://github.com/PauloHFS-ciandt/claude-mem-ciandt-worker"
     }
   ]
 }

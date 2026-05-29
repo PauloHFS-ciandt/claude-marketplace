@@ -1,3 +1,6 @@
 [submodule "plugins/einstein-workflow"]
 	path = plugins/einstein-workflow
 	url = git@github.com:PauloHFS-ciandt/einstein-workflow.git
+[submodule "plugins/claude-mem-ciandt-worker"]
+	path = plugins/claude-mem-ciandt-worker
+	url = git@github.com:PauloHFS-ciandt/claude-mem-ciandt-worker.git
