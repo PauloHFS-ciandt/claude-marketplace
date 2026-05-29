@@ -1,0 +1,3 @@
+[submodule "plugins/einstein-workflow"]
+	path = plugins/einstein-workflow
+	url = git@github.com:PauloHFS-ciandt/einstein-workflow.git

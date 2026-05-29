@@ -1,16 +1,18 @@
 {
-  "name": "einstein-workflow",
-  "description": "AI-powered development workflow for Einstein teams. Provides Tech Lead orchestration, specialist agents, security gates, and project setup wizards for Maestri + Claude Code.",
+  "name": "PauloHFS-ciandt",
+  "description": "Claude Code plugins by Paulo Hernane Ferreira (CI&T / Hospital Israelita Albert Einstein).",
   "owner": {
     "name": "Paulo Hernane Ferreira",
-    "email": "paulohf@ciandt.com"
+    "email": "paulohf@ciandt.com",
+    "url": "https://github.com/PauloHFS-ciandt"
   },
   "plugins": [
     {
       "name": "einstein-workflow",
       "description": "AI-powered development workflow for Einstein teams. Provides Tech Lead orchestration, specialist agents (Backend, Frontend, Mobile), brainstorm squad, security gates, and project setup wizards for Maestri + Claude Code.",
       "source": "./plugins/einstein-workflow",
-      "category": "workflow"
+      "category": "workflow",
+      "homepage": "https://github.com/PauloHFS-ciandt/einstein-workflow"
     }
   ]
 }
