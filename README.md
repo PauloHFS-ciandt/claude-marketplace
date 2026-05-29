@@ -1,6 +1,6 @@
-# einstein-workflow
+# claude-marketplace
 
-Plugin Claude Code para times Einstein. Instala um workflow completo de desenvolvimento AI com Tech Lead, especialistas, security gate, brainstorm squad — tudo orquestrado via Maestri.
+Marketplace Claude Code para times Einstein. Distribui o plugin `einstein-workflow` com um workflow completo de desenvolvimento AI: Tech Lead, especialistas, security gate, brainstorm squad — tudo orquestrado via Maestri.
 
 Stack-agnostic: os agents definem **metodologia**, o projeto define **contexto** via CLAUDE.md, e o claude-mem absorve os **padroes reais** do codebase.
 
@@ -13,7 +13,7 @@ Stack-agnostic: os agents definem **metodologia**, o projeto define **contexto**
 3. Cole isto no terminal:
 
 > Install and configure einstein-workflow by following the instructions here:
-> https://raw.githubusercontent.com/PauloHFS-ciandt/einstein-workflow/main/docs/install.md
+> https://raw.githubusercontent.com/PauloHFS-ciandt/claude-marketplace/main/docs/install.md
 
 O agente registra o marketplace, instala o plugin, configura o projeto, e monta o workspace do Maestri automaticamente — terminais, conexoes, roles, tudo no canvas.
 
@@ -21,10 +21,10 @@ O agente registra o marketplace, instala o plugin, configura o projeto, e monta 
 
 ```bash
 # 1. Registrar o marketplace (uma vez)
-claude plugin marketplace add PauloHFS-ciandt/einstein-workflow
+claude plugin marketplace add PauloHFS-ciandt/claude-marketplace
 
 # 2. Instalar o plugin
-claude plugin install einstein-workflow@einstein-workflow
+claude plugin install PauloHFS-ciandt@einstein-workflow
 
 # 3. Abrir o projeto
 cd seu-projeto && claude
@@ -51,10 +51,10 @@ Seguro re-rodar apos atualizacao do plugin.
 
 ```bash
 # 1. Atualizar o indice do marketplace (pull do repo)
-claude plugin marketplace update einstein-workflow
+claude plugin marketplace update PauloHFS-ciandt/claude-marketplace
 
 # 2. Atualizar o plugin
-claude plugin update einstein-workflow@einstein-workflow
+claude plugin update PauloHFS-ciandt@einstein-workflow
 
 # 3. Reiniciar o Claude Code para aplicar
 ```

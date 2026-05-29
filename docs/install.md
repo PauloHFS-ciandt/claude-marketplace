@@ -1,4 +1,4 @@
-# einstein-workflow — Automated Setup Guide
+# einstein-workflow — Automated Setup Guide (via claude-marketplace)
 
 You are configuring the einstein-workflow plugin for the current project. Follow each step in order. Do NOT skip steps. Do NOT improvise commands — run EXACTLY what is shown below. Ask the user for input when indicated.
 
@@ -33,18 +33,18 @@ claude plugin list 2>&1 | grep -q claude-mem || echo "OPTIONAL: claude-mem not i
 
 ## Step 1: Add Marketplace and Install Plugin
 
-**IMPORTANT: Do NOT run `claude plugin install PauloHFS-ciandt/einstein-workflow` — that will fail.** This plugin is distributed as a self-hosted marketplace, not via the default registry. You MUST add the marketplace first.
+**IMPORTANT: Do NOT run `claude plugin install PauloHFS-ciandt@einstein-workflow` directly without first adding the marketplace — that will fail.** This plugin is distributed via a self-hosted marketplace. You MUST add the marketplace first.
 
 Run these two commands in order:
 
 ```bash
-claude plugin marketplace add PauloHFS-ciandt/einstein-workflow
+claude plugin marketplace add PauloHFS-ciandt/claude-marketplace
 ```
 
 Wait for it to complete, then:
 
 ```bash
-claude plugin install einstein-workflow@einstein-workflow
+claude plugin install PauloHFS-ciandt@einstein-workflow
 ```
 
 If the marketplace is already added, the first command is a no-op. Same for the plugin if already installed.
@@ -52,8 +52,8 @@ If the marketplace is already added, the first command is a no-op. Same for the 
 **Updating an existing installation:**
 
 ```bash
-claude plugin marketplace update einstein-workflow
-claude plugin update einstein-workflow@einstein-workflow
+claude plugin marketplace update PauloHFS-ciandt/claude-marketplace
+claude plugin update PauloHFS-ciandt@einstein-workflow
 ```
 
 Then re-run Step 2 in each project to update the agents and rules copied to `.claude/`.
